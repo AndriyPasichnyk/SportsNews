@@ -1,0 +1,10 @@
+D:\GitHub\SportsNews\SportsNews.Data.Models\bin\Debug\netcoreapp3.1\SportsNews.Data.Models.deps.json
+D:\GitHub\SportsNews\SportsNews.Data.Models\bin\Debug\netcoreapp3.1\SportsNews.Data.Models.dll
+D:\GitHub\SportsNews\SportsNews.Data.Models\bin\Debug\netcoreapp3.1\SportsNews.Data.Models.pdb
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.GeneratedMSBuildEditorConfig.editorconfig
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.AssemblyInfoInputs.cache
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.AssemblyInfo.cs
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.csproj.CoreCompileInputs.cache
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.dll
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.pdb
+D:\GitHub\SportsNews\SportsNews.Data.Models\obj\Debug\netcoreapp3.1\SportsNews.Data.Models.csproj.AssemblyReference.cache

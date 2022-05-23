@@ -19,6 +19,8 @@ namespace SportsNews.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
         }
+
+        [HttpGet]
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -52,6 +54,7 @@ namespace SportsNews.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        [HttpGet]
         public ActionResult RegisterUser()
         {
             return View();
