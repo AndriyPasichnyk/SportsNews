@@ -86,7 +86,6 @@ D:\GitHub\SportsNews\SportsNews.Tests\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.
 D:\GitHub\SportsNews\SportsNews.Tests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 D:\GitHub\SportsNews\SportsNews.Tests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 D:\GitHub\SportsNews\SportsNews.Tests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
-D:\GitHub\SportsNews\SportsNews.Tests\obj\Debug\netcoreapp3.1\SportsNews.Tests.csproj.AssemblyReference.cache
 D:\GitHub\SportsNews\SportsNews.Tests\obj\Debug\netcoreapp3.1\SportsNews.Tests.GeneratedMSBuildEditorConfig.editorconfig
 D:\GitHub\SportsNews\SportsNews.Tests\obj\Debug\netcoreapp3.1\SportsNews.Tests.AssemblyInfoInputs.cache
 D:\GitHub\SportsNews\SportsNews.Tests\obj\Debug\netcoreapp3.1\SportsNews.Tests.AssemblyInfo.cs
