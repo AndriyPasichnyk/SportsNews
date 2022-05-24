@@ -21,14 +21,13 @@ namespace SportsNews.Controllers
         }
 
         [HttpGet]
-        public ActionResult Login(string returnUrl)
+        public ActionResult Login()
         {
-            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -89,6 +88,52 @@ namespace SportsNews.Controllers
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("RegisterUser", error.Description);
+                }
+                return View(model);
+            }
+        }
+
+        public ActionResult PersonalInfo()
+        {
+            var model = new UserInfoViewModel();
+            model.Email = User.Identity.Name;
+            model.FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name").Value;
+            model.LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value;
+          
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PersonalInfo(UserInfoViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await this.userManager.GetUserAsync(User);
+            if (user.Email != User.Identity.Name)
+            { 
+                user.Email = User.Identity.Name;
+            }
+
+            var claimFN = new Claim("First Name", model.FirstName);
+            var claimLN = new Claim("Last Name", model.LastName);
+
+            var result = await this.userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                var res1 = await this.userManager.ReplaceClaimAsync(user, User.Claims.FirstOrDefault(x => x.Type == "First Name"), claimFN);
+                var res2 = await this.userManager.ReplaceClaimAsync(user, User.Claims.FirstOrDefault(x => x.Type == "Last Name"), claimLN);
+
+                await this.signInManager.RefreshSignInAsync(user);
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("PersonalInfo", error.Description);
                 }
                 return View(model);
             }
