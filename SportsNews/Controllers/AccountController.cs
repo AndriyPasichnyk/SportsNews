@@ -23,20 +23,19 @@ namespace SportsNews.Controllers
         [HttpGet]
         public ActionResult Login()
         {
-            return View();
+            return View(new LayoutViewModel<LoginViewModel>(new LoginViewModel(), "Log in to Sports News"));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LayoutViewModel<LoginViewModel> model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+            var login = model.PageModel;
+            var result = await signInManager.PasswordSignInAsync(login.Email, login.Password, login.RememberMe, false);
             if (result.Succeeded)
             { 
                 return RedirectToAction("Index", "Home"); 
@@ -56,26 +55,26 @@ namespace SportsNews.Controllers
         [HttpGet]
         public ActionResult RegisterUser()
         {
-            return View();
+            return View(new LayoutViewModel<RegisterViewModel>(new RegisterViewModel(), "Create Account"));
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser(RegisterViewModel model)
+        public async Task<IActionResult> RegisterUser(LayoutViewModel<RegisterViewModel> model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-
+            
             var user = new IdentityUser
             {
-                UserName = model.Email,
-                Email = model.Email
+                UserName = model.PageModel.Email,
+                Email = model.PageModel.Email
             };
-            var claimFN = new Claim("First Name", model.FirstName);
-            var claimLN = new Claim("Last Name", model.LastName);
+            var claimFN = new Claim("First Name", model.PageModel.FirstName);
+            var claimLN = new Claim("Last Name", model.PageModel.LastName);
 
-            var result = await this.userManager.CreateAsync(user, model.Password);
+            var result = await this.userManager.CreateAsync(user, model.PageModel.Password);
 
             if (result.Succeeded)
             {
@@ -95,16 +94,17 @@ namespace SportsNews.Controllers
 
         public ActionResult PersonalInfo()
         {
-            var model = new UserInfoViewModel();
-            model.Email = User.Identity.Name;
-            model.FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name").Value;
-            model.LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value;
-          
-            return View(model);
+            var model = new UserInfoViewModel()
+            {
+                Email = User.Identity.Name,
+                FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name").Value,
+                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value
+            };
+            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info"));
         }
 
         [HttpPost]
-        public async Task<IActionResult> PersonalInfo(UserInfoViewModel model)
+        public async Task<IActionResult> PersonalInfo(LayoutViewModel<UserInfoViewModel> model)
         {
             if (!ModelState.IsValid)
             {
@@ -117,8 +117,8 @@ namespace SportsNews.Controllers
                 user.Email = User.Identity.Name;
             }
 
-            var claimFN = new Claim("First Name", model.FirstName);
-            var claimLN = new Claim("Last Name", model.LastName);
+            var claimFN = new Claim("First Name", model.PageModel.FirstName);
+            var claimLN = new Claim("Last Name", model.PageModel.LastName);
 
             var result = await this.userManager.UpdateAsync(user);
             if (result.Succeeded)
