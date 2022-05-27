@@ -1,6 +1,7 @@
 ﻿@model LayoutViewModel
 @if (User.Identity.IsAuthenticated)
 {
+    
     <div class="dropdown">
         <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
