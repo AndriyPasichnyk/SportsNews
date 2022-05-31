@@ -97,8 +97,8 @@ namespace SportsNews.Controllers
             var model = new UserInfoViewModel()
             {
                 Email = User.Identity.Name,
-                FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name").Value,
-                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value
+                FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty,
+                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty
             };
             return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info"));
         }
@@ -123,8 +123,8 @@ namespace SportsNews.Controllers
             var result = await this.userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                var res1 = await this.userManager.ReplaceClaimAsync(user, User.Claims.FirstOrDefault(x => x.Type == "First Name"), claimFN);
-                var res2 = await this.userManager.ReplaceClaimAsync(user, User.Claims.FirstOrDefault(x => x.Type == "Last Name"), claimLN);
+                await CreateOrReplaceClaim(user, "First Name", claimFN);
+                await CreateOrReplaceClaim(user, "Last Name", claimLN);
 
                 await this.signInManager.RefreshSignInAsync(user);
                 return RedirectToAction("Index", "Home");
@@ -137,6 +137,21 @@ namespace SportsNews.Controllers
                 }
                 return View(model);
             }
+        }
+
+        private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, string claimName, Claim newClaim)
+        {
+            IdentityResult result;
+            var claim = User.Claims.FirstOrDefault(x => x.Type == claimName);
+            if (claim != null)
+            {
+                result = await this.userManager.ReplaceClaimAsync(user, claim, newClaim);
+            }
+            else
+            {
+                result = await this.userManager.AddClaimAsync(user, newClaim);
+            }
+            return result;
         }
     }
 }

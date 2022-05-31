@@ -5,11 +5,11 @@
     <div class="dropdown">
         <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value
+                @(User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty) @(User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty)
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <h6 class="dropdown-header">
-                    <p>@User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value</p>
+                    <p>@(User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty) @(User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty)</p>
                     <p>@User.Identity.Name</p>
                 </h6>
                 <a class="dropdown-item" asp-controller="Account" asp-action="PersonalInfo">View profile</a>
