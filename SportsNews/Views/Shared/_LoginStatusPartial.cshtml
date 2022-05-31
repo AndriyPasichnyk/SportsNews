@@ -1,44 +1,87 @@
 ﻿@model LayoutViewModel
 @if (User.Identity.IsAuthenticated)
 {
-    
+    if (!Model.IsAdminMode)
+    {
+        <form class="form-inline my-2 my-lg-0" style="text-align: left;">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">...</button>
+        </form>
+        @*<div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </li>
+                </ul>
+            </div>*@
+        <div class="mr-2" style="text-align: left;">
+            Social media section
+        </div>
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Admin" asp-action="Index">=>A</A>
+    }
+    else
+    {
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Home" asp-action="Index">=>U</a>
+    }
+    @*<img src="@string.Format("data:image/png;base64,{0}", @Convert.ToBase64String(Model.ViewModel.Img))" width="300" height="300" />*@
     <div class="dropdown">
         <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value
+                <img class="img-responsive" alt="User Image"
+                     src="favicon.ico"
+                     width="32"
+                     height="32">@UserHelper.CreateUserFullName(Html, User)
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <h6 class="dropdown-header">
-                    <p>@User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value</p>
+                    <p>@UserHelper.CreateUserFullName(Html, User)</p>
                     <p>@User.Identity.Name</p>
                 </h6>
-                <a class="dropdown-item" asp-controller="Account" asp-action="PersonalInfo">View profile</a>
-                <a class="dropdown-item" href="#">Change Password</a>
-                <a class="dropdown-item" href="#">My surveys</a>
-                <a class="dropdown-item" href="#">Team hub</a>
+                @if (!Model.IsAdminMode)
+                {
+                    <a class="dropdown-item" asp-controller="Account" asp-action="PersonalInfo">View profile</a>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="UserPassword">Change Password</a>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="UserSurveys">My surveys</a>
+                    <a class="dropdown-item" asp-controller="Account" asp-action="UserTeamHub">Team hub</a>
+                }
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" type="submit" asp-controller="Account" asp-action="Logout">Log out</button>
             </div>
-        </form>
-    </div>
-}
-else
-{
-    if (Model.Title == "Create Account")
-    {
-        <div class="container">
-            Already Have an account? <a class="btn btn-outline-success" asp-controller="Account" asp-action="Login">Log in</a>
+            </form>
         </div>
-    }
-    else if (Model.Title == "Log in to Sports News")
-    {
-        <div class="container">
-            Don't have an account? <a class="btn btn-outline-success" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
+        <div class="dropdown" align="right">
+            <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                EN
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">UA</a>
+                <a class="dropdown-item" href="#">DE</a>
+                <a class="dropdown-item" href="#">FR</a>
+            </div>
         </div>
     }
     else
     {
-        <a class="btn btn-outline-success" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
-        <a class="btn btn-outline-success" asp-controller="Account" asp-action="Login">Log in</a>
+        if (Model.Title == "Create Account")
+        {
+            <div class="container" style="text-align: right;">
+                Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+            </div>
+        }
+        else if (Model.Title == "Log in to Sports News")
+        {
+            <div class="container" style="text-align: right;">
+                Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
+            </div>
+        }
+        else
+        {
+            <div class="container" style="text-align: right;">
+                <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
+                <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+            </div>
+        }
     }
-}
