@@ -1,27 +1,44 @@
-﻿@if (User.Identity.IsAuthenticated)
+﻿@model LayoutViewModel
+@if (User.Identity.IsAuthenticated)
 {
+    
     <div class="dropdown">
         <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                @User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value
+            <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @(User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty) @(User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty)
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="dropdown-item">
-                    <p style="font-size:10px;">@User.Claims.FirstOrDefault(x => x.Type == "First Name").Value @User.Claims.FirstOrDefault(x => x.Type == "Last Name").Value</p>
-                    <p style="font-size:10px;">@User.Identity.Name</p>
-                </div>
-                <div class="dropdown-divider"></div>
-                <a class="btn btn-link" asp-controller="Account" asp-action="PersonalInfo">View profile</a>
+                <h6 class="dropdown-header">
+                    <p>@(User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty) @(User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty)</p>
+                    <p>@User.Identity.Name</p>
+                </h6>
+                <a class="dropdown-item" asp-controller="Account" asp-action="PersonalInfo">View profile</a>
                 <a class="dropdown-item" href="#">Change Password</a>
                 <a class="dropdown-item" href="#">My surveys</a>
                 <a class="dropdown-item" href="#">Team hub</a>
                 <div class="dropdown-divider"></div>
-                <button type="submit" class="ml-2 btn btn-link">Log out</button>
+                <button class="dropdown-item" type="submit" asp-controller="Account" asp-action="Logout">Log out</button>
             </div>
         </form>
     </div>
 }
 else
 {
-    <a class="btn btn-link" asp-controller="Account" asp-action="Login">Login</a>
+    if (Model.Title == "Create Account")
+    {
+        <div class="container">
+            Already Have an account? <a class="btn btn-outline-success" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    }
+    else if (Model.Title == "Log in to Sports News")
+    {
+        <div class="container">
+            Don't have an account? <a class="btn btn-outline-success" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
+        </div>
+    }
+    else
+    {
+        <a class="btn btn-outline-success" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
+        <a class="btn btn-outline-success" asp-controller="Account" asp-action="Login">Log in</a>
+    }
 }

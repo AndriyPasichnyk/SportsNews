@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
 namespace SportsNews.Models
 {
     public class LoginViewModel

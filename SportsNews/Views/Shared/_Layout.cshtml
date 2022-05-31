@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@model LayoutViewModel
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -37,7 +38,7 @@
             </div>
         </nav>
     </header>
-    
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -46,7 +47,8 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2022 - SportsNews - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            Copyright &copy; 2022 Sports News
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy / Terms</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
