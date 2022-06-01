@@ -27,5 +27,8 @@ namespace SportsNews.Data
 
 
         public DbSet<SocialNetwork> SocialNetworks { get; set; }
+
+        // for User Profile images
+        public DbSet<UserPhoto> UserPhotos { get; set; }
     }
 }

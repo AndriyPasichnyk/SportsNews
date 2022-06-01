@@ -10,16 +10,20 @@ namespace SportsNews.Models
         public string Title { get; set; }
         public bool IsAdminMode { get; set; }
 
+        public string UserImg { get; set; }
+
         public LayoutViewModel(string title)
         {
             Title = title;
             IsAdminMode = false;
+            UserImg = string.Empty;
         }
 
-        public LayoutViewModel(string title, bool isAdminMode)
+        public LayoutViewModel(string title, bool isAdminMode, string userImg)
         {
             Title = title;
             IsAdminMode = isAdminMode;
+            UserImg = userImg;
         }
     }
 
@@ -27,18 +31,22 @@ namespace SportsNews.Models
     {
         public T PageModel { get; set; }
 
-        public LayoutViewModel() : base(string.Empty, false)
+        public LayoutViewModel() : base(string.Empty, false, string.Empty)
         { }
 
-        public LayoutViewModel(T pageModel, string title) : base(title, false)
+        public LayoutViewModel(T pageModel, string title) : base(title)
         {
             PageModel = pageModel;
         }
 
-        public LayoutViewModel(T pageModel, string title, bool isAdminMode) : base(title, isAdminMode)
+        public LayoutViewModel(T pageModel, string title, bool isAdminMode) : base(title, isAdminMode, string.Empty)
         {
             PageModel = pageModel;
         }
 
+        public LayoutViewModel(T pageModel, string title, bool isAdminMode, string userImg) : base(title, isAdminMode, userImg)
+        {
+            PageModel = pageModel;
+        }
     }
 }

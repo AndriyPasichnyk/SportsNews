@@ -22,6 +22,9 @@ namespace SportsNews.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
+        public string Image { get; set; }
+
+        [NotMapped]
         [Display(Name = "Profile Picture")]
         public IFormFile ProfileImage { get; set; }
     }

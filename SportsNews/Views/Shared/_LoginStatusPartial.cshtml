@@ -20,7 +20,7 @@
         <div class="mr-2" style="text-align: left;">
             Social media section
         </div>
-        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Admin" asp-action="Index">=>A</A>
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Admin" asp-action="Index">=>A</a>
     }
     else
     {
@@ -30,15 +30,17 @@
     <div class="dropdown">
         <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img class="img-responsive" alt="User Image"
-                     src="favicon.ico"
-                     width="32"
-                     height="32">@UserHelper.CreateUserFullName(Html, User)
+                <img class="img-responsive" alt="" src="@string.Format("data:image/png;base64,{0}", Model.UserImg)" width="30" height="30" />
+                <p style="font-size: small; font-weight: bold;">@UserHelper.CreateUserFullName(Html, User)</p>
+                @if (Model.IsAdminMode)
+                {
+                    <p style="font-size: x-small">Administrator</p>
+                }
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <h6 class="dropdown-header">
                     <p>@UserHelper.CreateUserFullName(Html, User)</p>
-                    <p>@User.Identity.Name</p>
+                    <p style="font-size: x-small">@User.Identity.Name</p>
                 </h6>
                 @if (!Model.IsAdminMode)
                 {
@@ -50,38 +52,38 @@
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" type="submit" asp-controller="Account" asp-action="Logout">Log out</button>
             </div>
-            </form>
+        </form>
+    </div>
+    <div class="dropdown" align="right">
+        <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            EN
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="#">UA</a>
+            <a class="dropdown-item" href="#">DE</a>
+            <a class="dropdown-item" href="#">FR</a>
         </div>
-        <div class="dropdown" align="right">
-            <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                EN
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">UA</a>
-                <a class="dropdown-item" href="#">DE</a>
-                <a class="dropdown-item" href="#">FR</a>
-            </div>
+    </div>
+}
+else
+{
+    if (Model.Title == "Create Account")
+    {
+        <div class="container" style="text-align: right;">
+            Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
+    }
+    else if (Model.Title == "Log in to Sports News")
+    {
+        <div class="container" style="text-align: right;">
+            Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
         </div>
     }
     else
     {
-        if (Model.Title == "Create Account")
-        {
-            <div class="container" style="text-align: right;">
-                Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
-            </div>
-        }
-        else if (Model.Title == "Log in to Sports News")
-        {
-            <div class="container" style="text-align: right;">
-                Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
-            </div>
-        }
-        else
-        {
-            <div class="container" style="text-align: right;">
-                <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
-                <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
-            </div>
-        }
+        <div class="container" style="text-align: right;">
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+        </div>
     }
+}
