@@ -149,7 +149,6 @@ namespace SportsNews.Controllers
             }
         }
 
-
         [HttpGet]
         public ActionResult UserPassword()
         {
@@ -168,8 +167,6 @@ namespace SportsNews.Controllers
             return View(new LayoutViewModel("Team Hub", false, UserInfoHelper.GetUserImage(applicationDbContext, User)));
         }
 
-
-
         private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, string claimName, Claim newClaim)
         {
             IdentityResult result;
@@ -184,6 +181,7 @@ namespace SportsNews.Controllers
             }
             return result;
         }
+
         private async Task<string> ConvertFileToString(IFormFile file)
         {
             string base64String = String.Empty;
@@ -218,6 +216,5 @@ namespace SportsNews.Controllers
             }
             this.applicationDbContext.SaveChanges();
         }
-
     }
 }
