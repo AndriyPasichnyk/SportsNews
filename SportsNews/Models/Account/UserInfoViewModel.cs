@@ -22,7 +22,7 @@ namespace SportsNews.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        public string Image { get; set; }
+        public byte[] Image { get; set; }
 
         [NotMapped]
         [Display(Name = "Profile Picture")]

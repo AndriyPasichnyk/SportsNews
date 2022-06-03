@@ -11,18 +11,18 @@ namespace SportsNews
     public static class UserInfoHelper
     {
 
-        public static string GetUserImage(ApplicationDbContext applicationDbContext, ClaimsPrincipal user)  
+        public static byte[] GetUserImage(ApplicationDbContext applicationDbContext, ClaimsPrincipal user)  
         {
             if (user.Identity.IsAuthenticated)
             {
                 var userId = applicationDbContext.Users.FirstOrDefault(u => u.UserName == user.Identity.Name)?.Id ?? String.Empty;
-                var picture = applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == userId)?.ProfilePicture ?? String.Empty;
-                
-                return picture;
+                var picture = applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == Guid.Parse(userId))?.ProfilePicture;
+
+                return picture!=null ? picture : Array.Empty<byte>();
             }
             else
             {
-                return String.Empty;
+                return Array.Empty<byte>();
             }
         }
     }

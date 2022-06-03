@@ -16,13 +16,13 @@ namespace SportsNews.Controllers
     {
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
-        private readonly ApplicationDbContext applicationDbContext;
+        private readonly UserPhotoUnitOfWork userPhotoUnitOfWork;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, ApplicationDbContext applicationDbContext)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, UserPhotoUnitOfWork userPhotoUnitOfWork)
         {
             this.userManager = userManager;
-            this.applicationDbContext = applicationDbContext;
             this.signInManager = signInManager;
+            this.userPhotoUnitOfWork = userPhotoUnitOfWork;
         }
 
         [HttpGet]
@@ -100,14 +100,15 @@ namespace SportsNews.Controllers
         [HttpGet]
         public ActionResult PersonalInfo()
         {
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
             var model = new UserInfoViewModel()
             {
                 Email = User.Identity.Name,
                 FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty,
                 LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty,
-                Image = UserInfoHelper.GetUserImage(applicationDbContext, User)
+                Image = userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
-            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, UserInfoHelper.GetUserImage(applicationDbContext, User)));
+            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, model.Image));
         }
 
         [HttpPost]
@@ -118,7 +119,7 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            string base64String = await ConvertFileToString(model.PageModel.ProfileImage);
+            byte[] imageBytes = await ConvertFileToByteArray(model.PageModel.ProfileImage);
 
             var user = await this.userManager.GetUserAsync(User);
             if (user.Email != User.Identity.Name)
@@ -134,7 +135,11 @@ namespace SportsNews.Controllers
             {
                 var res1 = await CreateOrReplaceClaim(user, "First Name", claimFirstName);
                 var res2 = await CreateOrReplaceClaim(user, "Last Name", claimLastName);
-                SaveUserImage(base64String);
+                this.userPhotoUnitOfWork.UserPhotos.UpdateUserPhoto(new UserPhoto
+                {
+                    UserId = Guid.Parse(user.Id),
+                    ProfilePicture = imageBytes
+                });
 
                 await this.signInManager.RefreshSignInAsync(user);
                 return RedirectToAction("Index", "Home");
@@ -153,19 +158,22 @@ namespace SportsNews.Controllers
         [HttpGet]
         public ActionResult UserPassword()
         {
-            return View(new LayoutViewModel("Change Password", false, UserInfoHelper.GetUserImage(applicationDbContext, User)));
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("Change Password", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserSurveys()
         {
-            return View(new LayoutViewModel("My Surveys", false, UserInfoHelper.GetUserImage(applicationDbContext, User)));
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("My Surveys", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserTeamHub()
         {
-            return View(new LayoutViewModel("Team Hub", false, UserInfoHelper.GetUserImage(applicationDbContext, User)));
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("Team Hub", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
 
@@ -184,40 +192,38 @@ namespace SportsNews.Controllers
             }
             return result;
         }
-        private async Task<string> ConvertFileToString(IFormFile file)
+        private async Task<byte[]> ConvertFileToByteArray(IFormFile file)
         {
-            string base64String = String.Empty;
             if (file != null)
             {
                 using (MemoryStream m = new MemoryStream())
                 {
                     await file.CopyToAsync(m);
                     byte[] imageBytes = m.ToArray();
-
-                    base64String = Convert.ToBase64String(imageBytes);
+                    return imageBytes;
                 }
             }
-            return base64String;
+            return Array.Empty<byte>();
         }
-        private void SaveUserImage(string picture)
-        {
-            var userId = this.userManager.GetUserId(User);
-            var userPhoto = this.applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == userId);
+        //private void SaveUserImage(string picture)
+        //{
+        //    var userId = this.userManager.GetUserId(User);
+        //    var userPhoto = this.applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == Guid.Parse(userId));
 
-            if (userPhoto != null)
-            {
-                userPhoto.ProfilePicture = picture;
-            }
-            else
-            {
-                this.applicationDbContext.UserPhotos.Add(new UserPhoto
-                {
-                    UserId = userId,
-                    ProfilePicture = picture
-                });
-            }
-            this.applicationDbContext.SaveChanges();
-        }
+        //    if (userPhoto != null)
+        //    {
+        //        userPhoto.ProfilePicture = Convert.FromBase64String(picture);
+        //    }
+        //    else
+        //    {
+        //        this.applicationDbContext.UserPhotos.Add(new UserPhoto
+        //        {
+        //            UserId = Guid.Parse(userId),
+        //            ProfilePicture = Convert.FromBase64String(picture)
+        //        });
+        //    }
+        //    this.applicationDbContext.SaveChanges();
+        //}
 
     }
 }

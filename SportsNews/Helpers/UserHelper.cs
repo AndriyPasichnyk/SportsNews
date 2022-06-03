@@ -7,7 +7,7 @@ namespace SportsNews
 {
     public static class UserHelper
     {
-        public static HtmlString CreateUserFullName(this IHtmlHelper html, ClaimsPrincipal user)
+        public static HtmlString GetUserFullNameFromClaims(this IHtmlHelper html, ClaimsPrincipal user)
         {
             var claimFN = user.Claims.FirstOrDefault(x => x.Type == "First Name");
             string firstName = claimFN != null ? claimFN.Value : string.Empty;

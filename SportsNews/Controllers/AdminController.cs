@@ -10,16 +10,15 @@ namespace SportsNews.Controllers
 {
     public class AdminController : Controller
     {
-        public ApplicationDbContext applicationDbContext { get; set; }
-
-        public AdminController(ApplicationDbContext applicationDbContext)
+        private readonly UserPhotoUnitOfWork userPhotoUnitOfWork;
+        public AdminController(UserPhotoUnitOfWork userPhotoUnitOfWork)
         {
-            this.applicationDbContext = applicationDbContext;
+            this.userPhotoUnitOfWork = userPhotoUnitOfWork;
         }
 
         public IActionResult Index()
         {
-            return View(new LayoutViewModel("Administration zone", true, UserInfoHelper.GetUserImage(applicationDbContext, User)));
+            return View(new LayoutViewModel("Administration zone", true, this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
         }
     }
 }

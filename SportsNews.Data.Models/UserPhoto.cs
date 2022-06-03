@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace SportsNews.Data.Models
 {
@@ -8,8 +9,8 @@ namespace SportsNews.Data.Models
 
         [Required]
         [StringLength(450)]
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
 
-        public string ProfilePicture { get; set; }
+        public byte[] ProfilePicture { get; set; }
     }
 }
