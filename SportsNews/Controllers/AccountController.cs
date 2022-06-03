@@ -154,7 +154,6 @@ namespace SportsNews.Controllers
             }
         }
 
-
         [HttpGet]
         public ActionResult UserPassword()
         {
@@ -175,8 +174,6 @@ namespace SportsNews.Controllers
             var userId = Guid.Parse(this.userManager.GetUserId(User));
             return View(new LayoutViewModel("Team Hub", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
-
-
 
         private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, string claimName, Claim newClaim)
         {
