@@ -5,17 +5,43 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Data
 {
-    public class InfoArchitectureUnitOfWork : IUnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext applicationDbContext;
+
         private CategoryRepository categoryRepository;
         private SubCategoryRepository subCategoryRepository;
         private TeamRepository teamRepository;
+        private IUserPhotoRepository userPhotoRepository;
+        private AdminMenuRepository adminMenuRepository;
 
-        public InfoArchitectureUnitOfWork(ApplicationDbContext applicationDbContext)
+        public UnitOfWork(ApplicationDbContext applicationDbContext)
         {
             this.applicationDbContext = applicationDbContext;
+        }
 
+        public AdminMenuRepository AdminMenu
+        {
+            get
+            {
+                if (this.adminMenuRepository == null)
+                {
+                    this.adminMenuRepository = new AdminMenuRepository(this.applicationDbContext);
+                }
+                return this.adminMenuRepository;
+            }
+        }
+
+        public IUserPhotoRepository UsersPhoto
+        {
+            get
+            {
+                if (this.userPhotoRepository == null)
+                {
+                    this.userPhotoRepository = new UserPhotoRepository(this.applicationDbContext);
+                }
+                return this.userPhotoRepository;
+            }
         }
 
         public CategoryRepository Categories
@@ -44,7 +70,7 @@ namespace SportsNews.Data
 
         public TeamRepository Teams
         {
-            get 
+            get
             {
                 if (this.teamRepository == null)
                 {
@@ -63,6 +89,7 @@ namespace SportsNews.Data
         {
             await this.applicationDbContext.SaveChangesAsync();
         }
+        
         public void Dispose()
         {
             this.applicationDbContext.Dispose();

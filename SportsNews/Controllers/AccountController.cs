@@ -16,13 +16,13 @@ namespace SportsNews.Controllers
     {
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
-        private readonly UserPhotoUnitOfWork userPhotoUnitOfWork;
+        private readonly IUnitOfWork unitOfWork;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, UserPhotoUnitOfWork userPhotoUnitOfWork)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
-            this.userPhotoUnitOfWork = userPhotoUnitOfWork;
+            this.unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -106,7 +106,7 @@ namespace SportsNews.Controllers
                 Email = User.Identity.Name,
                 FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty,
                 LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty,
-                Image = userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
+                Image = unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
             return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, model.Image));
         }
@@ -136,12 +136,12 @@ namespace SportsNews.Controllers
             {
                 var res1 = await CreateOrReplaceClaim(user, claimFirstName);
                 var res2 = await CreateOrReplaceClaim(user, claimLastName);
-                this.userPhotoUnitOfWork.UserPhotos.UpdateUserPhoto(new UserPhoto
+                this.unitOfWork.UsersPhoto.UpdateUserPhoto(new UserPhoto
                 {
                     UserId = Guid.Parse(user.Id),
                     ProfilePicture = imageBytes
                 });
-                await this.userPhotoUnitOfWork.SaveAsync();
+                await this.unitOfWork.SaveAsync();
 
                 await this.signInManager.RefreshSignInAsync(user);
                 return RedirectToAction("Index", "Home");
@@ -160,21 +160,21 @@ namespace SportsNews.Controllers
         public ActionResult UserPassword()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            return View(new LayoutViewModel("Change Password", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
+            return View(new LayoutViewModel("Change Password", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserSurveys()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            return View(new LayoutViewModel("My Surveys", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
+            return View(new LayoutViewModel("My Surveys", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserTeamHub()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            return View(new LayoutViewModel("Team Hub", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
+            return View(new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
 

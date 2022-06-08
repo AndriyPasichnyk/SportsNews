@@ -46,9 +46,7 @@ namespace SportsNews
             })
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddScoped<IUserPhotoRepository, UserPhotoRepository>();
-            services.AddScoped<UserPhotoUnitOfWork>();
-            services.AddScoped<InfoArchitectureUnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddControllersWithViews();
         }

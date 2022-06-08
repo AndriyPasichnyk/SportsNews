@@ -8,7 +8,6 @@ namespace SportsNews.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [StringLength(450)]
         public Guid UserId { get; set; }
 
         public byte[] ProfilePicture { get; set; }

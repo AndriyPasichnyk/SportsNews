@@ -12,23 +12,21 @@ namespace SportsNews.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly UserPhotoUnitOfWork userPhotoUnitOfWork;
         private readonly ApplicationDbContext applicationDbContext;
-        private readonly InfoArchitectureUnitOfWork infoArchitectureUnitOfWork;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IEnumerable<AdminMenu> menuItems;
 
-        public AdminController(UserPhotoUnitOfWork userPhotoUnitOfWork, ApplicationDbContext applicationDbContext, InfoArchitectureUnitOfWork infoArchitectureUnitOfWork)
+        public AdminController(ApplicationDbContext applicationDbContext, IUnitOfWork unitOfWork)
         {
             this.applicationDbContext = applicationDbContext;
-            this.userPhotoUnitOfWork = userPhotoUnitOfWork;
-            this.infoArchitectureUnitOfWork = infoArchitectureUnitOfWork;
-            menuItems = this.applicationDbContext.AdminMenuItems.ToList();
+            this.unitOfWork = unitOfWork;
+            menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
         }
 
         public IActionResult Index()
         {
             var model = new LayoutViewModel("Administration zone", true,
-                this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems
             };
@@ -41,14 +39,14 @@ namespace SportsNews.Controllers
         {
             var modelInfo = new InfoArchitectureViewModel
             {
-                Categories = infoArchitectureUnitOfWork.Categories.GetItems(),
+                Categories = unitOfWork.Categories.GetItems(),
                 SelectedCategoryId = 0,
                 SubCategories =  null, //infoArchitectureUnitOfWork.SubCategories.GetItems(),
                 SelectedSubCategoryId = 0,
                 Teams = null //infoArchitectureUnitOfWork.Teams.GetItems()
             };
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
-                this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()) 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()) 
             { 
                 Menu = this.menuItems 
             };
@@ -61,15 +59,15 @@ namespace SportsNews.Controllers
         {
             var modelInfo = new InfoArchitectureViewModel
             {
-                Categories = infoArchitectureUnitOfWork.Categories.GetItems(),
+                Categories = unitOfWork.Categories.GetItems(),
                 SelectedCategoryId = id,
-                SubCategories = infoArchitectureUnitOfWork.SubCategories.GetItemsByCategoryId(id),
+                SubCategories = unitOfWork.SubCategories.GetItemsByCategoryId(id),
                 SelectedSubCategoryId = subId,
-                Teams = infoArchitectureUnitOfWork.Teams.GetItemsBySubCategoryId(subId),
-                Name = subId==0 ? infoArchitectureUnitOfWork.Categories.GetItemByID(id).Name : infoArchitectureUnitOfWork.SubCategories.GetItemByID(subId).Name
+                Teams = unitOfWork.Teams.GetItemsBySubCategoryId(subId),
+                Name = subId==0 ? unitOfWork.Categories.GetItemByID(id).Name : unitOfWork.SubCategories.GetItemByID(subId).Name
             };
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
-                this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems
             };
@@ -86,13 +84,13 @@ namespace SportsNews.Controllers
 
             if (!string.IsNullOrEmpty(model.PageModel.Name))
             {
-                this.infoArchitectureUnitOfWork.Categories.InsertItem(new Category()
+                this.unitOfWork.Categories.InsertItem(new Category()
                 {
                     Name = model.PageModel.Name,
                     IsVisible = true,
                     IsStatic = false
                 });
-                this.infoArchitectureUnitOfWork.Save();
+                this.unitOfWork.Save();
             }
 
             return RedirectToAction("InfoArchitecture", "Admin");
@@ -130,13 +128,13 @@ namespace SportsNews.Controllers
 
             if (!string.IsNullOrEmpty(model.PageModel.Name))
             {
-                this.infoArchitectureUnitOfWork.Teams.InsertItem(new Team()
+                this.unitOfWork.Teams.InsertItem(new Team()
                 {
                     SubCategoryId = model.PageModel.SelectedSubCategoryId,
                     Name = model.PageModel.Name,
                     IsVisible = true,
                 });
-                this.infoArchitectureUnitOfWork.Save();
+                this.unitOfWork.Save();
             }
 
             return RedirectToAction("InfoArchitecture", "Admin", new { id = model.PageModel.SelectedCategoryId, subId = model.PageModel.SelectedSubCategoryId });
@@ -151,13 +149,13 @@ namespace SportsNews.Controllers
 
             if (!string.IsNullOrEmpty(model.PageModel.Name))
             {
-                this.infoArchitectureUnitOfWork.Categories.UpdateItem(new Category()
+                this.unitOfWork.Categories.UpdateItem(new Category()
                 {
                     Id = model.PageModel.SelectedCategoryId,
                     Name = model.PageModel.Name,
                     IsVisible = true
                 });
-                this.infoArchitectureUnitOfWork.Save();
+                this.unitOfWork.Save();
             }
 
             return RedirectToAction("InfoArchitecture", "Admin", new { id = model.PageModel.SelectedCategoryId });
