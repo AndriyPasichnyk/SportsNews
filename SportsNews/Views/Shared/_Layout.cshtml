@@ -21,27 +21,24 @@
     <div class="container" style="display: flex;">
         @if (Model.IsAdminMode)
         {
-            <div class="col-4" style="max-width: 260px; text-align: left">
-                <div class="list-group" id="list-tab" role="tablist">
-                    <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home">Surveys</a>
-                    <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile">Banners</a>
-                    <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages">Languages</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Footer</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Social Networks</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Users</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Information architecture</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Teams</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">News Partners</a>
-                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">Advertising</a>
+            if (Model.Menu != null)
+            {
+                <div class="col-4" style="max-width: 260px; text-align: left">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        @foreach (var item in Model.Menu)
+                        {
+                            <a class="list-group-item list-group-item-action @(Model.Title == item.Title ? "active" : string.Empty)" asp-controller="Admin" asp-action="@item.Action">@item.Title</a>
+                        }
+                    </div>
                 </div>
-            </div>
+            }
         }
         else if (Model.Title != "Log in to Sports News" && Model.Title != "Create Account")
-        { 
+        {
             <div class="col-4" style="max-width: 260px; text-align: left">
                 <div class="list-group" id="list-tab" role="tablist">
                     <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home">HOME</a>
-                    <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile">TEAM HUB</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="Admin" asp-action="InfoArchitecture">TEAM HUB</a>
                     <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages">LIFESTYLE</a>
                     <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">DEALBOOK</a>
                     <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">VIDEO</a>

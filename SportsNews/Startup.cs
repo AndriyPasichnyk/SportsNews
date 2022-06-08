@@ -48,6 +48,7 @@ namespace SportsNews
 
             services.AddScoped<IUserPhotoRepository, UserPhotoRepository>();
             services.AddScoped<UserPhotoUnitOfWork>();
+            services.AddScoped<InfoArchitectureUnitOfWork>();
 
             services.AddControllersWithViews();
         }

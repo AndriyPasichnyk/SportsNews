@@ -42,7 +42,7 @@ namespace SportsNews.Data
 
         public void InsertUserPhoto(UserPhoto userPhoto)
         {
-            this.applicationDbContext.Add(userPhoto);
+            this.applicationDbContext.UserPhotos.Add(userPhoto);
         }
 
         public void UpdateUserPhoto(UserPhoto userPhoto)

@@ -122,9 +122,10 @@ namespace SportsNews.Controllers
             byte[] imageBytes = await ConvertFileToByteArray(model.PageModel.ProfileImage);
 
             var user = await this.userManager.GetUserAsync(User);
-            if (user.Email != User.Identity.Name)
+            if (user.Email != model.PageModel.Email)
             {
-                user.Email = User.Identity.Name;
+                user.Email = model.PageModel.Email;
+                user.UserName = model.PageModel.Email;
             }
 
             var claimFirstName = new Claim("First Name", model.PageModel.FirstName);
@@ -133,13 +134,14 @@ namespace SportsNews.Controllers
             var result = await this.userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                var res1 = await CreateOrReplaceClaim(user, "First Name", claimFirstName);
-                var res2 = await CreateOrReplaceClaim(user, "Last Name", claimLastName);
+                var res1 = await CreateOrReplaceClaim(user, claimFirstName);
+                var res2 = await CreateOrReplaceClaim(user, claimLastName);
                 this.userPhotoUnitOfWork.UserPhotos.UpdateUserPhoto(new UserPhoto
                 {
                     UserId = Guid.Parse(user.Id),
                     ProfilePicture = imageBytes
                 });
+                await this.userPhotoUnitOfWork.SaveAsync();
 
                 await this.signInManager.RefreshSignInAsync(user);
                 return RedirectToAction("Index", "Home");
@@ -175,22 +177,26 @@ namespace SportsNews.Controllers
             return View(new LayoutViewModel("Team Hub", false, userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
-        private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, string claimName, Claim newClaim)
+
+
+        private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, Claim claim)
         {
             IdentityResult result;
-            var claim = User.Claims.FirstOrDefault(x => x.Type == claimName);
+            var claimforReplace = User.Claims.FirstOrDefault(x => x.Type == claim.Type);
             if (claim != null)
             {
-                result = await this.userManager.ReplaceClaimAsync(user, claim, newClaim);
+                result = await this.userManager.ReplaceClaimAsync(user, claimforReplace, claim);
             }
             else
             {
-                result = await this.userManager.AddClaimAsync(user, newClaim);
+                result = await this.userManager.AddClaimAsync(user, claim);
             }
             return result;
         }
+
         private async Task<byte[]> ConvertFileToByteArray(IFormFile file)
         {
+            string base64String = String.Empty;
             if (file != null)
             {
                 using (MemoryStream m = new MemoryStream())
@@ -202,25 +208,5 @@ namespace SportsNews.Controllers
             }
             return Array.Empty<byte>();
         }
-        //private void SaveUserImage(string picture)
-        //{
-        //    var userId = this.userManager.GetUserId(User);
-        //    var userPhoto = this.applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == Guid.Parse(userId));
-
-        //    if (userPhoto != null)
-        //    {
-        //        userPhoto.ProfilePicture = Convert.FromBase64String(picture);
-        //    }
-        //    else
-        //    {
-        //        this.applicationDbContext.UserPhotos.Add(new UserPhoto
-        //        {
-        //            UserId = Guid.Parse(userId),
-        //            ProfilePicture = Convert.FromBase64String(picture)
-        //        });
-        //    }
-        //    this.applicationDbContext.SaveChanges();
-        //}
-
     }
 }

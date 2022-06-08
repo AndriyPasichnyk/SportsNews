@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace SportsNews
 {
-    public static class UserHelper
+    public static class HTMLUserHelper
     {
         public static HtmlString GetUserFullNameFromClaims(this IHtmlHelper html, ClaimsPrincipal user)
         {

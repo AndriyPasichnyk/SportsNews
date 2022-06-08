@@ -34,7 +34,8 @@ namespace SportsNews.Data
         public DbSet<Article> Articles { get; set; }
 
 
-
+        // for Menus
+        public DbSet<AdminMenu> AdminMenuItems { get; set; }
 
         //        public DbSet<SocialNetwork> SocialNetworks { get; set; }
 
