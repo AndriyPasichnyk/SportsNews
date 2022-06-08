@@ -40,10 +40,11 @@ namespace SportsNews.Controllers
             var modelInfo = new InfoArchitectureViewModel
             {
                 Categories = unitOfWork.Categories.GetItems(),
-                SelectedCategoryId = 0,
-                SubCategories =  null, //infoArchitectureUnitOfWork.SubCategories.GetItems(),
-                SelectedSubCategoryId = 0,
-                Teams = null //infoArchitectureUnitOfWork.Teams.GetItems()
+                SubCategories =  null, 
+                Teams = null, 
+                SelectedCategory = new AdminMenuItemViewModel { Id = 0 },
+                SelectedSubCategory = new AdminMenuItemViewModel { Id = 0 },
+                SelectedTeam = new AdminMenuItemViewModel { Id = 0 }
             };
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()) 
@@ -55,16 +56,16 @@ namespace SportsNews.Controllers
 
         [HttpGet]
         [Route("/Admin/InfoArchitecture/{id}")]
-        public IActionResult InfoArchitecture(int id, int subId)
+        public IActionResult InfoArchitecture(int id, int subId, int tId)
         {
             var modelInfo = new InfoArchitectureViewModel
             {
                 Categories = unitOfWork.Categories.GetItems(),
-                SelectedCategoryId = id,
                 SubCategories = unitOfWork.SubCategories.GetItemsByCategoryId(id),
-                SelectedSubCategoryId = subId,
                 Teams = unitOfWork.Teams.GetItemsBySubCategoryId(subId),
-                Name = subId==0 ? unitOfWork.Categories.GetItemByID(id).Name : unitOfWork.SubCategories.GetItemByID(subId).Name
+                SelectedCategory = new AdminMenuItemViewModel { Id = id, Name = id != 0 ? unitOfWork.Categories.GetItemByID(id).Name : string.Empty },
+                SelectedSubCategory = new AdminMenuItemViewModel { Id = subId, Name = subId!=0 ? unitOfWork.SubCategories.GetItemByID(subId).Name : string.Empty },
+                SelectedTeam = new AdminMenuItemViewModel { Id = tId, Name = tId!=0 ? unitOfWork.Teams.GetItemByID(tId).Name : string.Empty }
             };
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
@@ -82,11 +83,11 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.PageModel.Name))
+            if (!string.IsNullOrEmpty(model.PageModel.SelectedCategory.NewName))
             {
                 this.unitOfWork.Categories.InsertItem(new Category()
                 {
-                    Name = model.PageModel.Name,
+                    Name = model.PageModel.SelectedCategory.NewName,
                     IsVisible = true,
                     IsStatic = false
                 });
@@ -104,18 +105,21 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.PageModel.Name))
+            if (!string.IsNullOrEmpty(model.PageModel.SelectedSubCategory.NewName))
             {
-                this.infoArchitectureUnitOfWork.SubCategories.InsertItem(new SubCategory() 
+                this.unitOfWork.SubCategories.InsertItem(new SubCategory() 
                 { 
-                    CategoryId = model.PageModel.SelectedCategoryId,
-                    Name = model.PageModel.Name,
+                    CategoryId = model.PageModel.SelectedCategory.Id,
+                    Name = model.PageModel.SelectedSubCategory.NewName,
                     IsVisible = true
                 });
-                this.infoArchitectureUnitOfWork.Save();
+                this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new { id = model.PageModel.SelectedCategoryId });
+            return RedirectToAction("InfoArchitecture", "Admin", new 
+            { 
+                id = model.PageModel.SelectedCategory.Id 
+            });
         }
 
         [HttpPost]
@@ -126,20 +130,25 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.PageModel.Name))
+            if (!string.IsNullOrEmpty(model.PageModel.SelectedTeam.NewName))
             {
                 this.unitOfWork.Teams.InsertItem(new Team()
                 {
-                    SubCategoryId = model.PageModel.SelectedSubCategoryId,
-                    Name = model.PageModel.Name,
+                    SubCategoryId = model.PageModel.SelectedSubCategory.Id,
+                    Name = model.PageModel.SelectedTeam.NewName,
                     IsVisible = true,
                 });
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new { id = model.PageModel.SelectedCategoryId, subId = model.PageModel.SelectedSubCategoryId });
+            return RedirectToAction("InfoArchitecture", "Admin", new
+            {
+                id = model.PageModel.SelectedCategory.Id, 
+                subId = model.PageModel.SelectedSubCategory.Id
+            });
         }
 
+        [HttpPost]
         public IActionResult EditCategory(LayoutViewModel<InfoArchitectureViewModel> model)
         {
             if (!ModelState.IsValid)
@@ -147,18 +156,122 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.PageModel.Name))
+            if (!string.IsNullOrEmpty(model.PageModel.SelectedCategory.Name))
             {
                 this.unitOfWork.Categories.UpdateItem(new Category()
                 {
-                    Id = model.PageModel.SelectedCategoryId,
-                    Name = model.PageModel.Name,
+                    Id = model.PageModel.SelectedCategory.Id,
+                    Name = model.PageModel.SelectedCategory.Name,
                     IsVisible = true
                 });
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new { id = model.PageModel.SelectedCategoryId });
+            return RedirectToAction("InfoArchitecture", "Admin", new
+            {
+                id = model.PageModel.SelectedCategory.Id 
+            });
+        }
+
+        [HttpPost]
+        public IActionResult EditSubCategory(LayoutViewModel<InfoArchitectureViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            { 
+                return View(model); }
+
+            if(!string.IsNullOrEmpty(model.PageModel.SelectedSubCategory.Name))
+            {
+                this.unitOfWork.SubCategories.UpdateItem(new SubCategory()
+                {
+                    Id = model.PageModel.SelectedSubCategory.Id,
+                    Name = model.PageModel.SelectedSubCategory.Name,
+                    IsVisible = true,
+                    CategoryId = model.PageModel.SelectedCategory.Id
+                });
+                this.unitOfWork.Save();
+            }
+
+            return RedirectToAction("InfoArchitecture", "Admin", new { 
+                id = model.PageModel.SelectedCategory.Id, 
+                subId = model.PageModel.SelectedSubCategory.Id 
+            });
+        }
+
+        [HttpPost]
+        public IActionResult EditTeam(LayoutViewModel<InfoArchitectureViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.PageModel.SelectedTeam.Name))
+            {
+                this.unitOfWork.Teams.UpdateItem(new Team()
+                {
+                    Id = model.PageModel.SelectedTeam.Id,
+                    Name = model.PageModel.SelectedTeam.Name,
+                    IsVisible = true,
+                    SubCategoryId = model.PageModel.SelectedSubCategory.Id
+                });
+                this.unitOfWork.Save();
+            }
+
+            return RedirectToAction("InfoArchitecture", "Admin", new {
+                id = model.PageModel.SelectedCategory.Id, 
+                subId = model.PageModel.SelectedSubCategory.Id,
+                tId =model.PageModel.SelectedTeam.Id
+            });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteCategory(LayoutViewModel<InfoArchitectureViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            this.unitOfWork.Categories.DeleteItem(model.PageModel.SelectedCategory.Id);
+            this.unitOfWork.Save();
+
+            return RedirectToAction("InfoArchitecture", "Admin");
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSubCategory(LayoutViewModel<InfoArchitectureViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            this.unitOfWork.SubCategories.DeleteItem(model.PageModel.SelectedSubCategory.Id);
+            this.unitOfWork.Save();
+
+            return RedirectToAction("InfoArchitecture", "Admin", new 
+            { 
+                id = model.PageModel.SelectedCategory.Id 
+            });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteTeam(LayoutViewModel<InfoArchitectureViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            this.unitOfWork.Teams.DeleteItem(model.PageModel.SelectedTeam.Id);
+            this.unitOfWork.Save();
+
+            return RedirectToAction("InfoArchitecture", "Admin", new 
+            { 
+                id = model.PageModel.SelectedCategory.Id, 
+                subId = model.PageModel.SelectedSubCategory.Id 
+            });
         }
     }
 }

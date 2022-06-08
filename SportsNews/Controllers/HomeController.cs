@@ -13,22 +13,22 @@ namespace SportsNews.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserPhotoUnitOfWork userPhotoUnitOfWork;
+        private readonly IUnitOfWork unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger, UserPhotoUnitOfWork userPhotoUnitOfWork)
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
         {
             _logger = logger;
-            this.userPhotoUnitOfWork = userPhotoUnitOfWork;
+            this.unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            return View(new LayoutViewModel("Home", false, this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+            return View(new LayoutViewModel("Home", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
         }
 
         public IActionResult Privacy()
         {
-            return View(new LayoutViewModel("Privacy", false, this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+            return View(new LayoutViewModel("Privacy", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -36,7 +36,7 @@ namespace SportsNews.Controllers
         {
             return View(new LayoutViewModel<ErrorViewModel>(
                 new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier },
-                "Error", false, this.userPhotoUnitOfWork.UserPhotos.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+                "Error", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
         }
     }
 }
