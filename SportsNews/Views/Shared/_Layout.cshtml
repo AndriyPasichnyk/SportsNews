@@ -10,39 +10,47 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3 " style="background-color: #e3f2fd;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="background-color: #e3f2fd;">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Sports Hub</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">...</button>
-                </form>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="mr-2">
-                    <!--               {  await Component.InvokeAsync("NavBar"); }-->
-                    <partial name="_LoginStatusPartial" />
-                </div>
+                <a class="navbar-brand" style="width: 260px; max-height: 100px;" asp-area="" asp-controller="Home" asp-action="Index">Sports Hub</a>
+                <partial name="_LoginStatusPartial" />
             </div>
         </nav>
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div class="container" style="display: flex;">
+        @if (Model.IsAdminMode)
+        {
+            if (Model.Menu != null)
+            {
+                <div class="col-4" style="max-width: 260px; text-align: left">
+                    <div class="list-group" id="list-tab" role="tablist">
+                        @foreach (var item in Model.Menu)
+                        {
+                            <a class="list-group-item list-group-item-action @(Model.Title == item.Title ? "active" : string.Empty)" asp-controller="Admin" asp-action="@item.Action">@item.Title</a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else if (Model.Title != "Log in to Sports News" && Model.Title != "Create Account")
+        {
+            <div class="col-4" style="max-width: 260px; text-align: left">
+                <div class="list-group" id="list-tab" role="tablist">
+                    <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home">HOME</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="Admin" asp-action="InfoArchitecture">TEAM HUB</a>
+                    <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages">LIFESTYLE</a>
+                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">DEALBOOK</a>
+                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">VIDEO</a>
+                </div>
+            </div>
+        }
+
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
     <footer class="border-top footer text-muted">

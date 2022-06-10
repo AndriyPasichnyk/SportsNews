@@ -1,0 +1,109 @@
+﻿@using SportsNews.Models
+@using SportsNews.Helpers
+@model LayoutViewModel<InfoArchitectureViewModel>
+@{
+    ViewData["Title"] = "Administration zone";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+Todo.... Edit, Delit, Move ??? (Category, SubCategory, Team)
+
+<partial name="_AddAdminMenuItemsPartial" />
+<partial name="_EditAdminMenuItemsPartial" />
+<partial name="_DeleteAdminMenuItemsPartial" />
+<table class="table-sm" border="1">
+    <thead>
+        <tr>
+            <td align="center">
+                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddCategoryModal">+ Add category</button>
+            </td>
+            <td align="center">
+                @if (Model.PageModel.SelectedCategory.Id != 0)
+                {
+                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddSubCategoryModal">+ Add subcategory</button>
+                }
+            </td>
+            <td align="center">
+                @if (Model.PageModel.SelectedSubCategory.Id != 0)
+                {
+                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddTeamModal">+ Add team</button>
+                }
+            </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @foreach (var item in Model.PageModel.Categories)
+                {
+                    <div class="list-group-item" style="display: flex;">
+                        <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedCategory.Id == item.Id ? "active" : string.Empty)"
+                           style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-id="@item.Id">@item.Name</a>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-success @(Model.PageModel.SelectedCategory.Id == item.Id ? string.Empty : "disabled")"
+                                    type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                ...
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                @if (!item.IsStatic)
+                                {
+                                    <button class="dropdown-item" data-toggle="modal" data-target="#DeleteCategoryModal">Delete</button>
+                                    <button class="dropdown-item" data-toggle="modal" data-target="#EditCategoryModal">Edit</button>
+                                }
+                                <a class="dropdown-item" href="#">Hide</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </td>
+            <td>
+                @if (Model.PageModel.SelectedCategory.Id != 0)
+                {
+                    foreach (var item in Model.PageModel.SubCategories)
+                    {
+                        <div class="list-group-item" style="display: flex;">
+                            <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedSubCategory.Id == item.Id ? "active" : string.Empty)"
+                               style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@item.Id">@item.Name</a>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success @(Model.PageModel.SelectedSubCategory.Id == item.Id ? string.Empty : "disabled")"
+                                        type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    ...
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" data-toggle="modal" data-target="#DeleteSubCategoryModal">Delete</a>
+                                    <a class="dropdown-item" data-toggle="modal" data-target="#EditSubCategoryModal">Edit</a>
+                                    <a class="dropdown-item" href="#">Hide</a>
+                                    <a class="dropdown-item" href="#">Move</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </td>
+            <td>
+                @if (Model.PageModel.SelectedSubCategory.Id != 0)
+                {
+                    foreach (var item in Model.PageModel.Teams)
+                    {
+                        <div class="list-group-item" style="display: flex;">
+                            <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedTeam.Id == item.Id ? "active" : string.Empty)"
+                               style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@Model.PageModel.SelectedSubCategory.Id" asp-route-tId="@item.Id">@item.Name</a>
+                            <div class="btn-group">
+                                <button class="btn btn-outline-success @(Model.PageModel.SelectedTeam.Id == item.Id ? string.Empty : "disabled")"
+                                        type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    ...
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" data-toggle="modal" data-target="#DeleteTeamModal">Delete</a>
+                                    <a class="dropdown-item" data-toggle="modal" data-target="#EditTeamModal">Edit</a>
+                                    <a class="dropdown-item" href="#">Hide</a>
+                                    <a class="dropdown-item" href="#">Move</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>

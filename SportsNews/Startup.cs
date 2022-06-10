@@ -46,6 +46,8 @@ namespace SportsNews
             })
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddControllersWithViews();
         }
 

@@ -14,34 +14,35 @@
         <div class="text-danger" asp-validation-summary="All"></div>
         <div class="form-group row">
             <div class="col-2">
-                <label asp-for="PageModel.Email"></label>
+                <label asp-for="@Model.PageModel.Email"></label>
             </div>
             <div class="col">
-                <input type="text" asp-for="PageModel.Email" class="form-control" />
+                <input type="text" asp-for="@Model.PageModel.Email" class="form-control" />
             </div>
-            <span class="text-danger" asp-validation-for="PageModel.Email"></span>
+            <span class="text-danger" asp-validation-for="@Model.PageModel.Email"></span>
         </div>
         <div class="form-group row">
             <div class="col-2">
-                <label asp-for="PageModel.Password"></label>
+                <label asp-for="@Model.PageModel.Password"></label>
             </div>
             <div class="col">
-                <input type="password" asp-for="PageModel.Password" class="form-control" />
+                <input type="password" asp-for="@Model.PageModel.Password" class="form-control" />
             </div>
-            <span class="text-danger" asp-validation-for="PageModel.Password"></span>
+            <span class="text-danger" asp-validation-for="@Model.PageModel.Password"></span>
         </div>
         <div class="row form-check mb-2">
             <div class="col-2">
-                <input type="checkbox" asp-for="PageModel.RememberMe" class="form-check-input" />
-                <label class="form-check-label" asp-for="PageModel.RememberMe"></label>
+                <input type="checkbox" asp-for="@Model.PageModel.RememberMe" class="form-check-input" />
+                <label class="form-check-label" asp-for="@Model.PageModel.RememberMe"></label>
             </div>
             <div class="col">
 
             </div>
         </div>
+        <input type="hidden" asp-for="@Model.Title" />
         <div class="form-group row">
             <div class="col-2">
-                <input type="submit" class="btn btn-primary" asp-controller="Account" asp-action="Login" value="Log in"/>
+                <input type="submit" class="btn btn-primary" asp-controller="Account" asp-action="Login" value="Log in" />
             </div>
         </div>
         <br />
