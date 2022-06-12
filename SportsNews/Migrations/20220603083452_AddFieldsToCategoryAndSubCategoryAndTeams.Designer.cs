@@ -10,8 +10,8 @@ using SportsNews.Data;
 namespace SportsNews.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220523132510_AddModels01")]
-    partial class AddModels01
+    [Migration("20220603083452_AddFieldsToCategoryAndSubCategoryAndTeams")]
+    partial class AddFieldsToCategoryAndSubCategoryAndTeams
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -247,6 +247,12 @@ namespace SportsNews.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("IsStatic")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -276,27 +282,6 @@ namespace SportsNews.Migrations
                     b.ToTable("Languages");
                 });
 
-            modelBuilder.Entity("SportsNews.Data.Models.SocialNetwork", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsFollowed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsShareEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SocialNetworks");
-                });
-
             modelBuilder.Entity("SportsNews.Data.Models.SubCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -306,6 +291,9 @@ namespace SportsNews.Migrations
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -324,6 +312,9 @@ namespace SportsNews.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("IsVisible")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -335,6 +326,25 @@ namespace SportsNews.Migrations
                     b.HasIndex("SubCategoryId");
 
                     b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("SportsNews.Data.Models.UserPhoto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte[]>("ProfilePicture")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasMaxLength(450);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPhotos");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

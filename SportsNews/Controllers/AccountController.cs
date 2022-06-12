@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using SportsNews.Models;
+using SportsNews.Data;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using SportsNews.Data.Models;
 
 namespace SportsNews.Controllers
 {
@@ -13,11 +16,13 @@ namespace SportsNews.Controllers
     {
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly IUnitOfWork unitOfWork;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -37,8 +42,8 @@ namespace SportsNews.Controllers
             var login = model.PageModel;
             var result = await signInManager.PasswordSignInAsync(login.Email, login.Password, login.RememberMe, false);
             if (result.Succeeded)
-            { 
-                return RedirectToAction("Index", "Home"); 
+            {
+                return RedirectToAction("Index", "Home");
             }
 
             ModelState.AddModelError("Login", "Invalid login attempt.");
@@ -65,7 +70,7 @@ namespace SportsNews.Controllers
             {
                 return View(model);
             }
-            
+
             var user = new IdentityUser
             {
                 UserName = model.PageModel.Email,
@@ -92,15 +97,18 @@ namespace SportsNews.Controllers
             }
         }
 
+        [HttpGet]
         public ActionResult PersonalInfo()
         {
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
             var model = new UserInfoViewModel()
             {
                 Email = User.Identity.Name,
                 FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty,
-                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty
+                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty,
+                Image = unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
-            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info"));
+            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, model.Image));
         }
 
         [HttpPost]
@@ -111,20 +119,29 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
+            byte[] imageBytes = await ConvertFileToByteArray(model.PageModel.ProfileImage);
+
             var user = await this.userManager.GetUserAsync(User);
-            if (user.Email != User.Identity.Name)
-            { 
-                user.Email = User.Identity.Name;
+            if (user.Email != model.PageModel.Email)
+            {
+                user.Email = model.PageModel.Email;
+                user.UserName = model.PageModel.Email;
             }
 
-            var claimFN = new Claim("First Name", model.PageModel.FirstName);
-            var claimLN = new Claim("Last Name", model.PageModel.LastName);
+            var claimFirstName = new Claim("First Name", model.PageModel.FirstName);
+            var claimLastName = new Claim("Last Name", model.PageModel.LastName);
 
             var result = await this.userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                await CreateOrReplaceClaim(user, "First Name", claimFN);
-                await CreateOrReplaceClaim(user, "Last Name", claimLN);
+                var res1 = await CreateOrReplaceClaim(user, claimFirstName);
+                var res2 = await CreateOrReplaceClaim(user, claimLastName);
+                this.unitOfWork.UsersPhoto.UpdateUserPhoto(new UserPhoto
+                {
+                    UserId = Guid.Parse(user.Id),
+                    ProfilePicture = imageBytes
+                });
+                await this.unitOfWork.SaveAsync();
 
                 await this.signInManager.RefreshSignInAsync(user);
                 return RedirectToAction("Index", "Home");
@@ -139,19 +156,57 @@ namespace SportsNews.Controllers
             }
         }
 
-        private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, string claimName, Claim newClaim)
+        [HttpGet]
+        public ActionResult UserPassword()
+        {
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("Change Password", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
+        }
+
+        [HttpGet]
+        public ActionResult UserSurveys()
+        {
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("My Surveys", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
+        }
+
+        [HttpGet]
+        public ActionResult UserTeamHub()
+        {
+            var userId = Guid.Parse(this.userManager.GetUserId(User));
+            return View(new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
+        }
+
+
+
+        private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, Claim claim)
         {
             IdentityResult result;
-            var claim = User.Claims.FirstOrDefault(x => x.Type == claimName);
+            var claimforReplace = User.Claims.FirstOrDefault(x => x.Type == claim.Type);
             if (claim != null)
             {
-                result = await this.userManager.ReplaceClaimAsync(user, claim, newClaim);
+                result = await this.userManager.ReplaceClaimAsync(user, claimforReplace, claim);
             }
             else
             {
-                result = await this.userManager.AddClaimAsync(user, newClaim);
+                result = await this.userManager.AddClaimAsync(user, claim);
             }
             return result;
+        }
+
+        private async Task<byte[]> ConvertFileToByteArray(IFormFile file)
+        {
+            string base64String = String.Empty;
+            if (file != null)
+            {
+                using (MemoryStream m = new MemoryStream())
+                {
+                    await file.CopyToAsync(m);
+                    byte[] imageBytes = m.ToArray();
+                    return imageBytes;
+                }
+            }
+            return Array.Empty<byte>();
         }
     }
 }

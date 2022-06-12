@@ -15,6 +15,18 @@ namespace SportsNews.Data
         {
         }
 
+        //protected override void OnModelCreating(ModelBuilder builder)
+        //{
+        //    base.OnModelCreating(builder);
+
+        //    builder.Entity<UserPhoto>().Property(t => t.UserId).HasColumnType("UniqueIdentifier");
+        //}
+
+        // for User Profile images
+        public DbSet<UserPhoto> UserPhotos { get; set; }
+        // common
+        public DbSet<Language> Languages { get; set; }
+
         // for Articles
         public DbSet<Category> Categories { get; set; }
         public DbSet<SubCategory> SubCategories { get; set; }
@@ -22,10 +34,10 @@ namespace SportsNews.Data
         public DbSet<Article> Articles { get; set; }
 
 
-        // common
-        public DbSet<Language> Languages { get; set; }
+        // for Menus
+        public DbSet<AdminMenu> AdminMenuItems { get; set; }
 
+        //        public DbSet<SocialNetwork> SocialNetworks { get; set; }
 
-        public DbSet<SocialNetwork> SocialNetworks { get; set; }
     }
 }
