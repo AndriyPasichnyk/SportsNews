@@ -9,10 +9,10 @@ namespace SportsNews
     {
         public static HtmlString GetUserFullNameFromClaims(this IHtmlHelper html, ClaimsPrincipal user)
         {
-            var claimFN = user.Claims.FirstOrDefault(x => x.Type == "First Name");
+            var claimFN = user.Claims.FirstOrDefault(x => x.Type == Claims.FirstName);
             string firstName = claimFN != null ? claimFN.Value : string.Empty;
 
-            var claimLN = user.Claims.FirstOrDefault(x => x.Type == "Last Name");
+            var claimLN = user.Claims.FirstOrDefault(x => x.Type == Claims.LastName);
             string lastName = claimLN != null ? claimLN.Value : string.Empty;
 
             return new HtmlString($"{firstName} {lastName}");

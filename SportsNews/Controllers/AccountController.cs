@@ -9,6 +9,9 @@ using SportsNews.Data;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using SportsNews.Data.Models;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SportsNews.Controllers
 {
@@ -17,18 +20,20 @@ namespace SportsNews.Controllers
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IEmailService sender;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork)
+        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IEmailService sender)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.unitOfWork = unitOfWork;
+            this.sender = sender;
         }
 
         [HttpGet]
         public ActionResult Login()
         {
-            return View(new LayoutViewModel<LoginViewModel>(new LoginViewModel(), "Log in to Sports News"));
+            return View(new LayoutViewModel<LoginViewModel>(new LoginViewModel(), "LogInAccount"));
         }
 
         [HttpPost]
@@ -60,7 +65,7 @@ namespace SportsNews.Controllers
         [HttpGet]
         public ActionResult RegisterUser()
         {
-            return View(new LayoutViewModel<RegisterViewModel>(new RegisterViewModel(), "Create Account"));
+            return View(new LayoutViewModel<RegisterViewModel>(new RegisterViewModel(), "CreateAccount"));
         }
 
         [HttpPost]
@@ -76,8 +81,8 @@ namespace SportsNews.Controllers
                 UserName = model.PageModel.Email,
                 Email = model.PageModel.Email
             };
-            var claimFN = new Claim("First Name", model.PageModel.FirstName);
-            var claimLN = new Claim("Last Name", model.PageModel.LastName);
+            var claimFN = new Claim(Claims.FirstName, model.PageModel.FirstName);
+            var claimLN = new Claim(Claims.LastName, model.PageModel.LastName);
 
             var result = await this.userManager.CreateAsync(user, model.PageModel.Password);
 
@@ -104,8 +109,8 @@ namespace SportsNews.Controllers
             var model = new UserInfoViewModel()
             {
                 Email = User.Identity.Name,
-                FirstName = User.Claims.FirstOrDefault(x => x.Type == "First Name")?.Value ?? String.Empty,
-                LastName = User.Claims.FirstOrDefault(x => x.Type == "Last Name")?.Value ?? String.Empty,
+                FirstName = User.Claims.FirstOrDefault(x => x.Type == Claims.FirstName)?.Value ?? String.Empty,
+                LastName = User.Claims.FirstOrDefault(x => x.Type == Claims.LastName)?.Value ?? String.Empty,
                 Image = unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
             return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, model.Image));
@@ -128,8 +133,8 @@ namespace SportsNews.Controllers
                 user.UserName = model.PageModel.Email;
             }
 
-            var claimFirstName = new Claim("First Name", model.PageModel.FirstName);
-            var claimLastName = new Claim("Last Name", model.PageModel.LastName);
+            var claimFirstName = new Claim(Claims.FirstName, model.PageModel.FirstName);
+            var claimLastName = new Claim(Claims.LastName, model.PageModel.LastName);
 
             var result = await this.userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -177,7 +182,80 @@ namespace SportsNews.Controllers
             return View(new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View(new LayoutViewModel<ForgotPasswordViewModel>(new ForgotPasswordViewModel(), "ForgotPassword"));
+        }       
 
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(LayoutViewModel<ForgotPasswordViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = this.userManager.FindByEmailAsync(model.PageModel.Email).Result;
+            if (user == null)
+            {
+                ModelState.AddModelError("ForgotPassword", "There are no user with this email!!!");
+                return View(model);
+            }
+
+            //TODO: Snnd e-mail
+            var userId = await this.userManager.GetUserIdAsync(user);
+            var code = await this.userManager.GeneratePasswordResetTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Scheme);
+            //await sender.SendEmailAsync(model.PageModel.Email, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+
+            return RedirectToAction("ForgotPasswordConfirmation", "Account");
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPasswordConfirmation()
+        {
+            return View(new LayoutViewModel<ForgotPasswordViewModel>(new ForgotPasswordViewModel(), "ForgotPasswordConfirmation"));
+        }
+
+        [HttpGet]
+        public ActionResult ResetPassword(string userId, string code)
+        {
+            if (code == null)
+            {
+                return View("Error");  
+            }
+
+            return View(new LayoutViewModel<ResetPasswordViewModel>(new ResetPasswordViewModel() { 
+                UserId = Guid.Parse(userId),
+                Code = code
+            }, "ResetPassword"));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ResetPassword(LayoutViewModel<ResetPasswordViewModel> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var user = await userManager.FindByIdAsync(model.PageModel.UserId.ToString());
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction("RegisterUser", "Account");
+            }
+
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.PageModel.Code));
+            var result = await userManager.ResetPasswordAsync(user, code, model.PageModel.Password);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View(model);
+        }
 
         private async Task<IdentityResult> CreateOrReplaceClaim(IdentityUser user, Claim claim)
         {

@@ -32,10 +32,11 @@ namespace SportsNews.Data
 
         public UserPhoto GetUserPhotoByUserName(string userName)
         {
+            // TODO: create separate logic for User Repository - do not mess UserPhoto with User Table
             if (!string.IsNullOrEmpty(userName))
             {
                 var user = this.applicationDbContext.Users.FirstOrDefault(u => u.UserName == userName);
-                return this.applicationDbContext.UserPhotos.FirstOrDefault(u => u.UserId == Guid.Parse(user.Id));
+                return GetUserPhotoByUserId(Guid.Parse(user.Id));
             }
             return null;
         }

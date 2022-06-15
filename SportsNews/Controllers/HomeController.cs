@@ -23,12 +23,14 @@ namespace SportsNews.Controllers
 
         public IActionResult Index()
         {
-            return View(new LayoutViewModel("Home", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+            return View(new LayoutViewModel("Home", false, 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()));
         }
 
         public IActionResult Privacy()
         {
-            return View(new LayoutViewModel("Privacy", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+            return View(new LayoutViewModel("Privacy", false, 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -36,7 +38,8 @@ namespace SportsNews.Controllers
         {
             return View(new LayoutViewModel<ErrorViewModel>(
                 new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier },
-                "Error", false, this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture));
+                "Error", false, 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>()));
         }
     }
 }

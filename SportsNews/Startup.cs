@@ -44,15 +44,21 @@ namespace SportsNews
 //                options.User.RequireUniqueEmail = true;
 //                options.SignIn.RequireConfirmedEmail = true;
             })
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            
+
+            services.AddTransient<IEmailService, EmailService>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -71,6 +77,9 @@ namespace SportsNews
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //Seeding Admin data
+            IdentityDataInitializer.SeedData(userManager, roleManager, Configuration);
 
             app.UseEndpoints(endpoints =>
             {
