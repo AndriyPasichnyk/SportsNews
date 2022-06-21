@@ -14,6 +14,8 @@ namespace SportsNews.Data
         SubCategoryRepository SubCategories { get; }
         TeamRepository Teams { get; }
 
+        LanguageRepository Languages { get; }
+
         void Save();
         Task SaveAsync();
     }

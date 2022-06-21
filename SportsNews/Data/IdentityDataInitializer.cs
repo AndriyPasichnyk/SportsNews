@@ -51,9 +51,9 @@ namespace SportsNews.Data
                     if (result.Succeeded)
                     {
                         userManager.AddClaimsAsync(user, new List<Claim> {
-                            new Claim(Claims.FirstName, configuration[Claims.FirstNameConfig]),
-                            new Claim(Claims.LastName, configuration[Claims.LastNameConfig])
-                        }).Wait(); 
+                            new Claim(Claims.FirstName, configuration[$"{AdminConfig.Name}:{Claims.FirstNameConfig}"]),
+                            new Claim(Claims.LastName, configuration[$"{AdminConfig.Name}:{Claims.LastNameConfig}"])
+                            }).Wait();
                         userManager.AddToRoleAsync(user, Roles.Administrator).Wait();
                     }
                 }

@@ -7,7 +7,7 @@ namespace SportsNews.Helpers
 {
     public static class HTMLListHelper
     {
-        public static HtmlString CreateCategoryList(this IHtmlHelper html, IEnumerable<ICategory> listItems)
+        public static HtmlString CreateCategoryList(this IHtmlHelper html, IEnumerable<Category> listItems)
         {
             string result = $"<div class=\"col-4\" style=\"max-width: 260px; text-align: left\">";
             result = $"{result}<div class=\"list-group\">";

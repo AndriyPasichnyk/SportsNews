@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SportsNews.Data.Models;
+﻿using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,43 +6,39 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Data
 {
-    public class CategoryRepository : IItemRepository<Category>
+    public class LanguageRepository : IItemRepository<Language>
     {
-        internal ApplicationDbContext applicationDbContext;
+        private readonly ApplicationDbContext applicationDbContext;
 
-        public CategoryRepository(ApplicationDbContext applicationDbContext)
+        public LanguageRepository(ApplicationDbContext applicationDbContext)
         {
             this.applicationDbContext = applicationDbContext;
         }
 
-        public IEnumerable<Category> GetItems()
+        public IEnumerable<Language> GetItems()
         {
-            return applicationDbContext.Categories.Include("Subcategories.Teams").ToList();
+            return this.applicationDbContext.Languages.ToList();
         }
 
-        public Category GetItemByID(int id)
+        public Language GetItemByID(int id)
         {
-            return this.applicationDbContext.Categories.Include("Subcategories.Teams").FirstOrDefault(u => u.Id == id);
+            return this.applicationDbContext.Languages.FirstOrDefault(l => l.Id == id);
         }
 
-        public IEnumerable<Category> GetItemsByID(int id)
+        public void InsertItem(Language item)
         {
-            return this.applicationDbContext.Categories.Where(u => u.Id == id).Include("Subcategories.Teams").ToList();
+            this.applicationDbContext.Languages.Add(item);
         }
 
-        public void InsertItem(Category item)
-        {
-            this.applicationDbContext.Categories.Add(item);
-        }
-
-        public void UpdateItem(Category item)
+        public void UpdateItem(Language item)
         {
             var tItem = GetItemByID(item.Id);
 
             if (tItem != null)
             {
                 tItem.Name = item.Name;
-                tItem.IsVisible = item.IsVisible;
+                tItem.Abbreviation = item.Abbreviation;
+                tItem.IsEnabled = item.IsEnabled;
             }
             else
             {
@@ -54,7 +49,7 @@ namespace SportsNews.Data
         public void DeleteItem(int id)
         {
             var item = GetItemByID(id);
-            this.applicationDbContext.Categories.Remove(item);
+            this.applicationDbContext.Languages.Remove(item);
         }
 
         private bool disposed = false;

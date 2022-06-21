@@ -31,7 +31,7 @@ namespace SportsNews
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("Admin@sportnews.com", "Password Recovery"),
+                From = new EmailAddress("abstract.rodharuz@gmail.com", "Password Recovery"),
                 Subject = subject,
                 PlainTextContent = message,
                 HtmlContent = message

@@ -1,6 +1,8 @@
-﻿namespace SportsNews.Data.Models
+﻿using System.Collections.Generic;
+
+namespace SportsNews.Data.Models
 {
-    public class SubCategory : ICategory
+    public class SubCategory
     {
         public int Id { get; set; }
 
@@ -10,5 +12,7 @@
 
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+
+        public IEnumerable<Team> Teams { get; set; }
     }
 }

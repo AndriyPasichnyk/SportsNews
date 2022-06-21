@@ -14,6 +14,7 @@ namespace SportsNews.Data
         private TeamRepository teamRepository;
         private IUserPhotoRepository userPhotoRepository;
         private AdminMenuRepository adminMenuRepository;
+        private LanguageRepository languageRepository;
 
         public UnitOfWork(ApplicationDbContext applicationDbContext)
         {
@@ -77,6 +78,18 @@ namespace SportsNews.Data
                     this.teamRepository = new TeamRepository(applicationDbContext);
                 }
                 return teamRepository;
+            }
+        }
+
+        public LanguageRepository Languages
+        {
+            get
+            {
+                if (this.languageRepository == null)
+                {
+                    this.languageRepository = new LanguageRepository(applicationDbContext);
+                }
+                return languageRepository;
             }
         }
 

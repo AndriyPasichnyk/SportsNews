@@ -1,0 +1,97 @@
+﻿@model LayoutViewModel<TeamsViewModel>
+
+<div class="container" style="display:flex;">
+    <h2 style="align-self:center;">@Model.Title</h2>
+    <div class="container" style="align-self:center; text-align:end;">
+        <button class="btn-primary" type="submit">+ Add Team</button>
+    </div>
+</div>
+<hr>
+<div class="container">
+    <div class="container" style="display: flex;">
+        <div style="width:80%;">
+            map
+        </div>
+        <div class="container">
+            <p>SELECT LOCATION</p>
+            <br>
+            @using (Html.BeginForm("Teams", "Admin", FormMethod.Post))
+            {
+                <p>SELECT CATEGORY</p>
+                <div class="input-group">
+                    <select class="custom-select" id="inputGroupSelect04" asp-for="PageModel.SelectedCategory.Id">
+                        <option value="0" selected>All</option>
+                        @foreach (var item in Model.PageModel.Categories)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-secondary">Select</button>
+                    </div>
+                </div>
+                <br>
+                <p>SELECT SUBCATEGORY</p>
+                <div class="input-group">
+                    <select class="custom-select" id="inputGroupSelect04" asp-for="PageModel.SelectedSubCategory.Id">
+                        <option value="0" selected>All</option>
+                        @foreach (var item in Model.PageModel.SubCategories)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-secondary">Select</button>
+                    </div>
+                </div>
+                <br>
+                <p>SELECT TEAM</p>
+                <div class="input-group">
+                    <select class="custom-select" id="inputGroupSelect04" asp-for="PageModel.SelectedTeam.Id">
+                        <option value="0" selected>All</option>
+                        @foreach (var item in Model.PageModel.Teams)
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-secondary">Select</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        Table
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <td>TEAMS</td>
+                    <td>LOCATION</td>
+                    <td>DATE ADDED</td>
+                    <td>CATEGORY</td>
+                    <td>SUBCATEGORY</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model.PageModel.Categories)
+                {
+                    foreach (var sub in cat.Subcategories)
+                    {
+                        foreach (var team in sub.Teams)
+                        {
+                            <tr>
+                                <td>@team.Name</td>
+                                <td></td>
+                                <td>@team.DateAdded</td>
+                                <td>@cat.Name</td>
+                                <td>@sub.Name</td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+            </table>
+    </div>
+</div>

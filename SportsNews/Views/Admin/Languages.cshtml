@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using SportsNews.Data.Models
+@inject IViewLocalizer Localizer
+@model LayoutViewModel<Language>
+
+<partial name="_LanguagePartial" />
+<div class="container" style="display:flex;">
+    <h2 style="align-self:center;">@Model.Title</h2>
+    <div class="container" style="align-self:center; text-align:end;">
+        <button class="btn-primary" type="submit" data-toggle="modal" data-target="#AddLanguageModal">@Localizer["+ New Languages"]</button>
+    </div>
+</div>
+<hr>
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <td>@Localizer["LANGUAGES"]</td>
+                <td>@Localizer["STATUS"]</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Languages)
+            {
+                <tr>
+                    <td style="vertical-align: middle;">
+                        <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
+                            <a class="list-group-item list-group-item-action @(Model.PageModel.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;"
+                               asp-controller="Admin" asp-action="Languages" asp-route-id="@item.Id">
+                                @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsEnabled ? string.Empty : " (Hidden)")</strong></span>
+                            </a>
+                        </div>
+                    </td>
+                    <td @(Model.PageModel.Id == item.Id ? string.Empty : "hidden") style="vertical-align: middle;">
+                        <form method="post">
+                            <input type="hidden" asp-for="PageModel.Id" />
+                            <input type="hidden" asp-for="Title" />
+                            <button type="submit" class="btn-primary" asp-controller="Admin" asp-action="HideOrUnhideLanguage">
+                                @(item.IsEnabled ? "Disable" : "Enable")
+                            </button>
+                        </form>
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <button class="btn-primary" type="submit" data-toggle="modal" @(Model.PageModel.Id == item.Id ? string.Empty : "hidden") data-target="#DeleteLanguageModal">
+                        Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

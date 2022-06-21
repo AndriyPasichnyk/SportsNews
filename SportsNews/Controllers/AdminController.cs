@@ -15,12 +15,14 @@ namespace SportsNews.Controllers
         private readonly ApplicationDbContext applicationDbContext;
         private readonly IUnitOfWork unitOfWork;
         private readonly IEnumerable<AdminMenu> menuItems;
+        private readonly IEnumerable<Language> languages;
 
         public AdminController(ApplicationDbContext applicationDbContext, IUnitOfWork unitOfWork)
         {
             this.applicationDbContext = applicationDbContext;
             this.unitOfWork = unitOfWork;
             menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
+            languages = this.unitOfWork.Languages.GetItems().ToList();
         }
 
         public IActionResult Index()
@@ -28,12 +30,13 @@ namespace SportsNews.Controllers
             var model = new LayoutViewModel("Administration zone", true,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
-                Menu = this.menuItems
+                Menu = this.menuItems,
+                Languages = this.languages
             };
             return View(model);
         }
 
-        //Information architecture
+        #region Information architecture
         [HttpGet]
         public IActionResult InfoArchitecture()
         {
@@ -49,7 +52,8 @@ namespace SportsNews.Controllers
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
-                Menu = this.menuItems
+                Menu = this.menuItems,
+                Languages = this.languages
             };
             return View(model);
         }
@@ -63,23 +67,27 @@ namespace SportsNews.Controllers
                 Categories = unitOfWork.Categories.GetItems(),
                 SubCategories = unitOfWork.SubCategories.GetItemsByCategoryId(id),
                 Teams = unitOfWork.Teams.GetItemsBySubCategoryId(subId),
-                SelectedCategory = new AdminMenuItemViewModel { 
-                    Id = id, 
+                SelectedCategory = new AdminMenuItemViewModel
+                {
+                    Id = id,
                     Name = id != 0 ? unitOfWork.Categories.GetItemByID(id).Name : string.Empty
                 },
-                SelectedSubCategory = new AdminMenuItemViewModel { 
-                    Id = subId, 
+                SelectedSubCategory = new AdminMenuItemViewModel
+                {
+                    Id = subId,
                     Name = subId != 0 ? unitOfWork.SubCategories.GetItemByID(subId).Name : string.Empty
                 },
-                SelectedTeam = new AdminMenuItemViewModel { 
-                    Id = tId, 
+                SelectedTeam = new AdminMenuItemViewModel
+                {
+                    Id = tId,
                     Name = tId != 0 ? unitOfWork.Teams.GetItemByID(tId).Name : string.Empty
                 }
             };
             var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
-                Menu = this.menuItems
+                Menu = this.menuItems,
+                Languages = this.languages
             };
             return View(model);
         }
@@ -343,5 +351,126 @@ namespace SportsNews.Controllers
                 tId = model.PageModel.SelectedTeam.Id
             });
         }
+        #endregion
+
+        #region Teams
+        [HttpGet]
+        public IActionResult Teams()
+        {
+            var modelTeams = new TeamsViewModel
+            {
+                Categories = unitOfWork.Categories.GetItems(),
+                SubCategories = unitOfWork.SubCategories.GetItems(),
+                Teams = unitOfWork.Teams.GetItems(),
+            };
+            var model = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Teams(LayoutViewModel<TeamsViewModel> model)
+        {
+            var modelTeams = new TeamsViewModel
+            {
+                Categories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.Categories.GetItems() : unitOfWork.Categories.GetItemsByID(model.PageModel.SelectedCategory.Id),
+                SubCategories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.SubCategories.GetItems() : unitOfWork.SubCategories.GetItemsByCategoryId(model.PageModel.SelectedCategory.Id),
+                Teams = model.PageModel.SelectedSubCategory.Id == 0 ? unitOfWork.Teams.GetItems() : unitOfWork.Teams.GetItemsBySubCategoryId(model.PageModel.SelectedSubCategory.Id),
+                SelectedCategory = model.PageModel.SelectedCategory,
+                SelectedSubCategory = model.PageModel.SelectedSubCategory,
+                SelectedTeam = model.PageModel.SelectedTeam
+            };
+            var modelNew = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(modelNew);
+        }
+        #endregion
+
+        #region Languages
+        [HttpGet]
+        public IActionResult Languages()
+        {
+            return RedirectToAction("Languages", "Admin", new { id = 0 });
+        }
+
+        [HttpGet]
+        [Route("/Admin/Languages/{id}")]
+        public IActionResult Languages(int id)
+        {
+            var lModel = id == 0 ? new Language() : unitOfWork.Languages.GetItemByID(id);
+            var model = new LayoutViewModel<Language>(lModel, "Languages", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult HideOrUnhideLanguage(LayoutViewModel<Language> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var item = this.unitOfWork.Languages.GetItemByID(model.PageModel.Id);
+            if (item != null)
+            {
+                item.IsEnabled = !item.IsEnabled;
+                this.unitOfWork.Languages.UpdateItem(item);
+                this.unitOfWork.Save();
+            }
+
+            return RedirectToAction("Languages", "Admin", new { id = model.PageModel.Id });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteLanguage(LayoutViewModel<Language> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            this.unitOfWork.Languages.DeleteItem(model.PageModel.Id);
+            this.unitOfWork.Save();
+
+            return RedirectToAction("Languages", "Admin", new { id = 0 });
+        }
+
+        [HttpPost]
+        public IActionResult AddLanguage(LayoutViewModel<Language> model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.PageModel.Name) && !string.IsNullOrEmpty(model.PageModel.Abbreviation))
+            {
+                this.unitOfWork.Languages.InsertItem(new Language()
+                {
+                    Name = model.PageModel.Name,
+                    Abbreviation = model.PageModel.Abbreviation,
+                    IsEnabled = true
+                });
+                this.unitOfWork.Save();
+            }
+
+            return RedirectToAction("Languages", "Admin", new { id = 0 });
+        }
+        #endregion
+
+
     }
 }

@@ -12,6 +12,7 @@ using SportsNews.Data.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace SportsNews.Controllers
 {
@@ -21,6 +22,7 @@ namespace SportsNews.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly IUnitOfWork unitOfWork;
         private readonly IEmailService sender;
+        private readonly IEnumerable<Language> languages;
 
         public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IEmailService sender)
         {
@@ -28,6 +30,7 @@ namespace SportsNews.Controllers
             this.signInManager = signInManager;
             this.unitOfWork = unitOfWork;
             this.sender = sender;
+            this.languages = this.unitOfWork.Languages.GetItems().ToList();
         }
 
         [HttpGet]
@@ -106,14 +109,19 @@ namespace SportsNews.Controllers
         public ActionResult PersonalInfo()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new UserInfoViewModel()
+            var innerModel = new UserInfoViewModel()
             {
                 Email = User.Identity.Name,
                 FirstName = User.Claims.FirstOrDefault(x => x.Type == Claims.FirstName)?.Value ?? String.Empty,
                 LastName = User.Claims.FirstOrDefault(x => x.Type == Claims.LastName)?.Value ?? String.Empty,
                 Image = unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
-            return View(new LayoutViewModel<UserInfoViewModel>(model, "Personal Info", false, model.Image));
+            var model = new LayoutViewModel<UserInfoViewModel>(innerModel, "Personal Info", false, innerModel.Image)
+            {
+                Languages = this.languages
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -208,7 +216,7 @@ namespace SportsNews.Controllers
             var code = await this.userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Scheme);
-            //await sender.SendEmailAsync(model.PageModel.Email, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+            await sender.SendEmailAsync(model.PageModel.Email, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
             return RedirectToAction("ForgotPasswordConfirmation", "Account");
         }
