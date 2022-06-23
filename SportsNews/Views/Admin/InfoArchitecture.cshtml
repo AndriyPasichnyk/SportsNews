@@ -31,7 +31,7 @@
             {
                 <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
                     <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedCategory.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
-                       asp-controller="Admin" asp-action="InfoArchitecture" asp-route-id="@item.Id">
+                       asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-id="@item.Id">
                         @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span>
                     </a>
                     <div class="btn-group">
@@ -47,7 +47,7 @@
                             }
                             <form method="post">
                                 <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
-                                <button type="submit" class="dropdown-item" asp-controller="Admin" asp-action="HideOrUnhideCategory">@(item.IsVisible ? "Hide" : "Show")</button>
+                                <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideCategory">@(item.IsVisible ? "Hide" : "Show")</button>
                             </form>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                 {
                     <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
                         <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedSubCategory.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
-                           asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@item.Id">
+                           asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-subId="@item.Id">
                             @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span>
                         </a>
                         <div class="btn-group">
@@ -75,7 +75,7 @@
                                 <form method="post">
                                     <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
                                     <input type="hidden" asp-for="PageModel.SelectedSubCategory.Id" />
-                                    <button type="submit" class="dropdown-item" asp-controller="Admin" asp-action="HideOrUnhideSubCategory">@(item.IsVisible ? "Hide" : "Show")</button>
+                                    <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideSubCategory">@(item.IsVisible ? "Hide" : "Show")</button>
                                 </form>
                                 <a class="dropdown-item" href="#">Move</a>
                             </div>
@@ -91,7 +91,7 @@
             {
                 <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
                     <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedTeam.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
-                       asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@Model.PageModel.SelectedSubCategory.Id" asp-route-tId="@item.Id">
+                       asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-subId="@Model.PageModel.SelectedSubCategory.Id" asp-route-tId="@item.Id">
                         @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span> 
                     </a>
                     <a style="font-size:x-small"></a>
@@ -107,7 +107,7 @@
                                 <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
                                 <input type="hidden" asp-for="PageModel.SelectedSubCategory.Id" />
                                 <input type="hidden" asp-for="PageModel.SelectedTeam.Id" />
-                                <button type="submit" class="dropdown-item" asp-controller="Admin" asp-action="HideOrUnhideTeam">@(item.IsVisible ? "Hide" : "Show")</button>
+                                <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideTeam">@(item.IsVisible ? "Hide" : "Show")</button>
                             </form>
                             <a class="dropdown-item" href="#">Move</a>
                         </div>

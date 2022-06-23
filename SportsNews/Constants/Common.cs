@@ -19,4 +19,13 @@ namespace SportsNews
         public const string FirstNameConfig = "FirstName";
         public const string LastNameConfig = "LastName";
     }
+
+    public class ControllersNames
+    {
+        public const string Admin = "Admin";
+        public const string Account = "Account";
+        public const string Home = "Home";
+        public const string Language = "Language";
+    }
+
 }

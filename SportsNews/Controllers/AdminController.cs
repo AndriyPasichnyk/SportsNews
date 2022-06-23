@@ -15,15 +15,13 @@ namespace SportsNews.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly ApplicationDbContext applicationDbContext;
         private readonly IUnitOfWork unitOfWork;
         private readonly IOptions<RequestLocalizationOptions> locOptions;
         private readonly IEnumerable<AdminMenu> menuItems;
         private readonly IEnumerable<Language> languages;
 
-        public AdminController(ApplicationDbContext applicationDbContext, IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions)
+        public AdminController(IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions)
         {
-            this.applicationDbContext = applicationDbContext;
             this.unitOfWork = unitOfWork;
             this.locOptions = locOptions;
             menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
@@ -116,7 +114,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin");
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin);
         }
 
         [HttpPost]
@@ -138,7 +136,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id
             });
@@ -159,11 +157,12 @@ namespace SportsNews.Controllers
                     SubCategoryId = model.PageModel.SelectedSubCategory.Id,
                     Name = model.PageModel.SelectedTeam.NewName,
                     IsVisible = true,
+                    DateAdded = DateTime.Now
                 });
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id
@@ -186,7 +185,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id
             });
@@ -208,7 +207,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id
@@ -231,7 +230,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id,
@@ -250,7 +249,7 @@ namespace SportsNews.Controllers
             this.unitOfWork.Categories.DeleteItem(model.PageModel.SelectedCategory.Id);
             this.unitOfWork.Save();
 
-            return RedirectToAction("InfoArchitecture", "Admin");
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin);
         }
 
         [HttpPost]
@@ -264,7 +263,7 @@ namespace SportsNews.Controllers
             this.unitOfWork.SubCategories.DeleteItem(model.PageModel.SelectedSubCategory.Id);
             this.unitOfWork.Save();
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id
             });
@@ -281,7 +280,7 @@ namespace SportsNews.Controllers
             this.unitOfWork.Teams.DeleteItem(model.PageModel.SelectedTeam.Id);
             this.unitOfWork.Save();
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id
@@ -304,7 +303,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id
             });
@@ -326,7 +325,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id
@@ -349,7 +348,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("InfoArchitecture", "Admin", new
+            return RedirectToAction("InfoArchitecture", ControllersNames.Admin, new
             {
                 id = model.PageModel.SelectedCategory.Id,
                 subId = model.PageModel.SelectedSubCategory.Id,
@@ -397,13 +396,64 @@ namespace SportsNews.Controllers
             };
             return View(modelNew);
         }
+
+        [HttpPost]
+        public IActionResult AddNewTeamWithDetails(LayoutViewModel<TeamsViewModel> model)
+        {
+            var modelTeams = new TeamsViewModel
+            {
+                Categories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.Categories.GetItems() : unitOfWork.Categories.GetItemsByID(model.PageModel.SelectedCategory.Id),
+                SubCategories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.SubCategories.GetItems() : unitOfWork.SubCategories.GetItemsByCategoryId(model.PageModel.SelectedCategory.Id),
+                Teams = model.PageModel.SelectedSubCategory.Id == 0 ? unitOfWork.Teams.GetItems() : unitOfWork.Teams.GetItemsBySubCategoryId(model.PageModel.SelectedSubCategory.Id),
+                SelectedCategory = model.PageModel.SelectedCategory,
+                SelectedSubCategory = model.PageModel.SelectedSubCategory,
+                SelectedTeam = model.PageModel.SelectedTeam
+            };
+            var modelNew = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+
+            if (string.IsNullOrEmpty(model.PageModel.SelectedTeam.NewName))
+            {
+                ModelState.AddModelError("AddNewTeamWithDetails", "Team couldn't be empty!!!");
+            }
+            if (model.PageModel.SelectedCategory.Id== 0)
+            {
+                ModelState.AddModelError("AddNewTeamWithDetails", "Category should be selected for adding new team!");
+            }
+            if (model.PageModel.SelectedSubCategory.Id == 0)
+            {
+                ModelState.AddModelError("AddNewTeamWithDetails", "Subcategory should be selected for adding new team!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Teams", modelNew);
+            }
+
+            this.unitOfWork.Teams.InsertItem(new Team()
+            {
+                SubCategoryId = model.PageModel.SelectedSubCategory.Id,
+                Name = model.PageModel.SelectedTeam.NewName,
+                IsVisible = true,
+                DateAdded = DateTime.Now
+            });
+            this.unitOfWork.Save();
+
+            modelNew.PageModel.SelectedTeam.NewName = string.Empty;
+
+            return View("Teams", modelNew);
+        }
         #endregion
 
         #region Languages
         [HttpGet]
         public IActionResult Languages()
         {
-            return RedirectToAction("Languages", "Admin", new { id = 0 });
+            return RedirectToAction("Languages", ControllersNames.Admin, new { id = 0 });
         }
 
         [HttpGet]
@@ -436,7 +486,7 @@ namespace SportsNews.Controllers
                 this.unitOfWork.Save();
             }
 
-            return RedirectToAction("Languages", "Admin", new { id = model.PageModel.Id });
+            return RedirectToAction("Languages", ControllersNames.Admin, new { id = model.PageModel.Id });
         }
 
         [HttpPost]
@@ -463,7 +513,7 @@ namespace SportsNews.Controllers
                 }
             }
 
-            return RedirectToAction("Languages", "Admin", new { id = 0 });
+            return RedirectToAction("Languages", ControllersNames.Admin, new { id = 0 });
         }
 
         [HttpPost]
@@ -494,7 +544,7 @@ namespace SportsNews.Controllers
                 }
             }
 
-            return RedirectToAction("Languages", "Admin", new { id = 0 });
+            return RedirectToAction("Languages", ControllersNames.Admin, new { id = 0 });
         }
         #endregion
 

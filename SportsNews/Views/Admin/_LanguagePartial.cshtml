@@ -24,7 +24,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
-                    <button type="submit" class="btn btn-primary" id="delete-language-button" asp-controller="Admin" asp-action="DeleteLanguage">@Localizer["Delete"]</button>
+                    <button type="submit" class="btn btn-primary" id="delete-language-button" asp-controller="@ControllersNames.Admin" asp-action="DeleteLanguage">@Localizer["Delete"]</button>
                 </div>
             </form>
         </div>
@@ -55,7 +55,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
-                    <button type="submit" class="btn btn-primary" id="add-language-button" asp-controller="Admin" asp-action="AddLanguage">@Localizer["Add"]</button>
+                    <button type="submit" class="btn btn-primary" id="add-language-button" asp-controller="@ControllersNames.Admin" asp-action="AddLanguage">@Localizer["Add"]</button>
                 </div>
             </form>
         </div>

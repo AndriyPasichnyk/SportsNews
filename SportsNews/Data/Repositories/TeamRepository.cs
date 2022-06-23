@@ -1,4 +1,5 @@
-﻿using SportsNews.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace SportsNews.Data
 
         public IEnumerable<Team> GetItemsBySubCategoryId(int id)
         {
-            return this.applicationDbContext.Teams.Where(t => t.SubCategoryId == id).ToList();
+            return this.applicationDbContext.Teams.Where(t => t.SubCategoryId == id).Include("TeamBadge").Include("TeamLocation").ToList();
         }
 
         public Team GetItemByID(int id)

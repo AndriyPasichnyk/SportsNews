@@ -23,14 +23,14 @@
         <div class="mr-2" style="text-align: left;">
             Social media section
         </div>
-        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Admin" asp-action="Index">=>A</a>
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="@ControllersNames.Admin" asp-action="Index">=>A</a>
     }
     else
     {
-        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="Home" asp-action="Index">=>U</a>
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="@ControllersNames.Home" asp-action="Index">=>U</a>
     }
     <div class="dropdown">
-        <form method="post" class="form-inline" asp-controller="Account" asp-action="Logout">
+        <form method="post" class="form-inline" asp-controller="@ControllersNames.Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img class="img-responsive" alt="" src="@string.Format("data:image/png;base64,{0}",@Convert.ToBase64String(Model.UserImg))" width="30" height="30" />
                 <p style="font-size: small; font-weight: bold;">@HTMLUserHelper.GetUserFullNameFromClaims(Html, User)</p>
@@ -46,13 +46,13 @@
                 </h6>
                 @if (!Model.IsAdminMode)
                 {
-                    <a class="dropdown-item" asp-controller="Account" asp-action="PersonalInfo">@Localizer["View profile"]</a>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">@Localizer["Change password"]</a>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="UserSurveys">@Localizer["My surveys"]</a>
-                    <a class="dropdown-item" asp-controller="Account" asp-action="UserTeamHub">@Localizer["Team hub"]</a>
+                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="PersonalInfo">@Localizer["View profile"]</a>
+                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="ChangePassword">@Localizer["Change password"]</a>
+                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserSurveys">@Localizer["My surveys"]</a>
+                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserTeamHub">@Localizer["Team hub"]</a>
                 }
                 <div class="dropdown-divider"></div>
-                <button class="dropdown-item" type="submit" asp-controller="Account" asp-action="Logout">@Localizer["Log out"]</button>
+                <button class="dropdown-item" type="submit" asp-controller="@ControllersNames.Account" asp-action="Logout">@Localizer["Log out"]</button>
             </div>
         </form>
     </div>
@@ -67,15 +67,9 @@
                 {
                     if (item.IsEnabled)
                     {
-                        <a class="dropdown-item" asp-controller="Language" asp-action="Change" asp-route-id="@item.Id">@item.Abbreviation</a>
+                        <a class="dropdown-item" asp-controller="@ControllersNames.Language" asp-action="Change" asp-route-id="@item.Id">@item.Abbreviation</a>
                     }
                 }
-            }
-            else
-            {
-                <a class="dropdown-item" asp-controller="Language" asp-action="Change" asp-route-id="0">EN</a>
-                <a class="dropdown-item" asp-controller="Language" asp-action="Change" asp-route-id="1">DE</a>
-                <a class="dropdown-item" asp-controller="Language" asp-action="Change" asp-route-id="2">FR</a>
             }
         </div>
     </div>
@@ -85,20 +79,20 @@ else
     if (Model.Title == "Create Account")
     {
         <div class="container" style="text-align: right;">
-            Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+            Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="Login">Log in</a>
         </div>
     }
     else if (Model.Title == "Log in to Sports News")
     {
         <div class="container" style="text-align: right;">
-            Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Get Started</a>
+            Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="RegisterUser">Get Started</a>
         </div>
     }
     else
     {
         <div class="container" style="text-align: right;">
-            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="RegisterUser">Sign Up</a>
-            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="Account" asp-action="Login">Log in</a>
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="RegisterUser">Sign Up</a>
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="Login">Log in</a>
         </div>
     }
 }

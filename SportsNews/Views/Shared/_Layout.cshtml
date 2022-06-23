@@ -27,19 +27,19 @@
                     <div class="list-group" id="list-tab" role="tablist">
                         @foreach (var item in Model.Menu)
                         {
-                            <a class="list-group-item list-group-item-action @(Model.Title == item.Title ? "active" : string.Empty)" asp-controller="Admin" asp-action="@item.Action">@item.Title</a>
+                            <a class="list-group-item list-group-item-action @(Model.Title == item.Title ? "active" : string.Empty)" asp-controller="@ControllersNames.Admin" asp-action="@item.Action">@item.Title</a>
                         }
                     </div>
                 </div>
             }
         }
-        else if (Model.Title != "LogInAccount" && Model.Title != "CreateAccount" && Model.Title != "ForgotPassword" && 
+        else if (Model.Title != "LogInAccount" && Model.Title != "CreateAccount" && Model.Title != "ForgotPassword" &&
             Model.Title != "ForgotPasswordConfirmation" && Model.Title != "ResetPassword")
         {
             <div class="col-4" style="max-width: 260px; text-align: left">
                 <div class="list-group" id="list-tab" role="tablist">
                     <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home">HOME</a>
-                    <a class="list-group-item list-group-item-action" asp-controller="Admin" asp-action="InfoArchitecture">TEAM HUB</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture">TEAM HUB</a>
                     <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages">LIFESTYLE</a>
                     <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">DEALBOOK</a>
                     <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">VIDEO</a>
@@ -63,6 +63,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhp-i8NIWkPgcEyxJ9vp9siz0aTfH8_nY"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

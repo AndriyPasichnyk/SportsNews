@@ -211,7 +211,6 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            //TODO: Snnd e-mail
             var userId = await this.userManager.GetUserIdAsync(user);
             var code = await this.userManager.GeneratePasswordResetTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

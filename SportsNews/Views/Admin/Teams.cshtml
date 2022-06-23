@@ -2,21 +2,28 @@
 
 <div class="container" style="display:flex;">
     <h2 style="align-self:center;">@Model.Title</h2>
-    <div class="container" style="align-self:center; text-align:end;">
-        <button class="btn-primary" type="submit">+ Add Team</button>
+    <div class="container" style="align-self: center; text-align: end;">
     </div>
 </div>
 <hr>
 <div class="container">
     <div class="container" style="display: flex;">
         <div style="width:80%;">
-            map
+            <div id="map-canvas" style="height: 500px; width: 500px">
+            </div>
         </div>
         <div class="container">
-            <p>SELECT LOCATION</p>
-            <br>
-            @using (Html.BeginForm("Teams", "Admin", FormMethod.Post))
+            @using (Html.BeginForm("Teams", ControllersNames.Admin, FormMethod.Post))
             {
+                <div class="text-danger" asp-validation-summary="All"></div>
+                <p>SELECT LOCATION</p>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="location-name" asp-for="PageModel.SelectedTeam.Name" />
+                    <div class="input-group-append">
+                        <button type="button" id="location-btn" class="btn btn-outline-secondary">Search</button>
+                    </div>
+                </div>
+                <br>
                 <p>SELECT CATEGORY</p>
                 <div class="input-group">
                     <select class="custom-select" id="inputGroupSelect04" asp-for="PageModel.SelectedCategory.Id">
@@ -45,18 +52,12 @@
                     </div>
                 </div>
                 <br>
-                <p>SELECT TEAM</p>
+                <p>TEAM</p>
                 <div class="input-group">
-                    <select class="custom-select" id="inputGroupSelect04" asp-for="PageModel.SelectedTeam.Id">
-                        <option value="0" selected>All</option>
-                        @foreach (var item in Model.PageModel.Teams)
-                        {
-                            <option value="@item.Id">@item.Name</option>
-                        }
-                    </select>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-outline-secondary">Select</button>
-                    </div>
+                    <input type="text" class="form-control" id="new-team-name" asp-for="PageModel.SelectedTeam.NewName" />
+                </div>
+                <div class="input-group">
+                    <button type="submit" class="btn-primary" id="team-add-btn" asp-controller="@ControllersNames.Admin" asp-action="AddNewTeamWithDetails">+ Add Team</button>
                 </div>
             }
         </div>
@@ -92,6 +93,71 @@
                     }
                 }
             </tbody>
-            </table>
+        </table>
     </div>
 </div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var geocoder = new google.maps.Geocoder();
+            var com = 'USA, Los Angeles';
+            if (document.getElementById('location-name').value != '') {
+                com = document.getElementById('location-name').value;
+            };
+            geocoder.geocode({ 'address': com }, function (results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var x = results[0].geometry.location.lat();
+                    var y = results[0].geometry.location.lng();
+                    var latlng = new google.maps.LatLng(x, y);
+                    var myOptions = {
+                        zoom: 8,
+                        center: latlng,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    };
+                    map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(x, y),
+                        map: map,
+                        title: com
+                    });
+                    var infowindow = new google.maps.InfoWindow({
+                        content: com
+                    });
+                    infowindow.open(map, marker);
+                    google.maps.event.addDomListener(window, 'load');
+                } else {
+                    res.innerHTML = "Enter correct Details: " + status;
+                }
+            });
+            $("#location-btn").click(function () {
+                var geocoder = new google.maps.Geocoder();
+                var com = document.getElementById('location-name').value;
+                geocoder.geocode({ 'address': com }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        var x = results[0].geometry.location.lat();
+                        var y = results[0].geometry.location.lng();
+                        var latlng = new google.maps.LatLng(x, y);
+                        var myOptions = {
+                            zoom: 8,
+                            center: latlng,
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        };
+                        map = new google.maps.Map(document.getElementById("map-canvas"), myOptions);
+                        var marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(x, y),
+                            map: map,
+                            title: com
+                        });
+                        var infowindow = new google.maps.InfoWindow({
+                            content: com
+                        });
+                        infowindow.open(map, marker);
+                        google.maps.event.addDomListener(window, 'load');
+                    } else {
+                        res.innerHTML = "Enter correct Details: " + status;
+                    }
+                });
+            });
+        });
+    </script>
+}
