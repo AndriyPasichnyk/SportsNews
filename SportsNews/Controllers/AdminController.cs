@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using SportsNews.Data;
 using SportsNews.Data.Models;
 using SportsNews.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,13 +17,15 @@ namespace SportsNews.Controllers
     {
         private readonly ApplicationDbContext applicationDbContext;
         private readonly IUnitOfWork unitOfWork;
+        private readonly IOptions<RequestLocalizationOptions> locOptions;
         private readonly IEnumerable<AdminMenu> menuItems;
         private readonly IEnumerable<Language> languages;
 
-        public AdminController(ApplicationDbContext applicationDbContext, IUnitOfWork unitOfWork)
+        public AdminController(ApplicationDbContext applicationDbContext, IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions)
         {
             this.applicationDbContext = applicationDbContext;
             this.unitOfWork = unitOfWork;
+            this.locOptions = locOptions;
             menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
             languages = this.unitOfWork.Languages.GetItems().ToList();
         }
@@ -442,8 +447,21 @@ namespace SportsNews.Controllers
                 return View(model);
             }
 
-            this.unitOfWork.Languages.DeleteItem(model.PageModel.Id);
-            this.unitOfWork.Save();
+            var lang = this.unitOfWork.Languages.GetItemByID(model.PageModel.Id);
+            if (lang != null)
+            {
+                this.unitOfWork.Languages.DeleteItem(model.PageModel.Id);
+                this.unitOfWork.Save();
+
+                var culture = new CultureInfo(lang.Abbreviation);
+                if (this.locOptions.Value.SupportedCultures.Contains(culture))
+                {
+                    var list = this.locOptions.Value.SupportedCultures.ToList();
+                    list.Remove(culture);
+                    this.locOptions.Value.SupportedCultures = list;
+                    this.locOptions.Value.SupportedUICultures = list;
+                }
+            }
 
             return RedirectToAction("Languages", "Admin", new { id = 0 });
         }
@@ -465,6 +483,15 @@ namespace SportsNews.Controllers
                     IsEnabled = true
                 });
                 this.unitOfWork.Save();
+
+                var culture = new CultureInfo(model.PageModel.Abbreviation);
+                if (!this.locOptions.Value.SupportedCultures.Contains(culture))
+                {
+                    var list = this.locOptions.Value.SupportedCultures.ToList();
+                    list.Add(culture);
+                    this.locOptions.Value.SupportedCultures = list;
+                    this.locOptions.Value.SupportedUICultures = list;
+                }
             }
 
             return RedirectToAction("Languages", "Admin", new { id = 0 });
