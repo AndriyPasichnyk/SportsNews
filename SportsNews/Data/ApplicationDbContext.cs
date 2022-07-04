@@ -37,7 +37,6 @@ namespace SportsNews.Data
 
         public DbSet<TeamBadge> TeamBadges { get; set; }
         public DbSet<Location> Locations { get; set; }
-        public DbSet<TeamLocation> TeamLocations { get; set; }
 
         // for Menus
         public DbSet<AdminMenu> AdminMenuItems { get; set; }

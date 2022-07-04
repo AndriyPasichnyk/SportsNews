@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SportsNews.Data.Models;
+﻿using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,43 +6,42 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Data
 {
-    public class TeamRepository : IItemRepository<Team>
+    public class TeamLocationsRepository: IItemRepository<Location>
     {
-        internal ApplicationDbContext applicationDbContext;
+        private readonly ApplicationDbContext applicationDbContext;
 
-        public TeamRepository(ApplicationDbContext applicationDbContext)
+        public TeamLocationsRepository(ApplicationDbContext applicationDbContext)
         {
             this.applicationDbContext = applicationDbContext;
         }
 
-        public IEnumerable<Team> GetItems()
+        public IEnumerable<Location> GetItems()
         {
-            return this.applicationDbContext.Teams.ToList();
+            return this.applicationDbContext.Locations.ToList();
         }
 
-        public IEnumerable<Team> GetItemsBySubCategoryId(int id)
+        public Location GetItemByID(int id)
         {
-            return this.applicationDbContext.Teams.Where(t => t.SubCategoryId == id).Include("TeamBadge").Include("Location").ToList();
+            return this.applicationDbContext.Locations.Where(b => b.Id == id).FirstOrDefault();
         }
 
-        public Team GetItemByID(int id)
+        public Location FindItemByName(string name)
         {
-            return this.applicationDbContext.Teams.FirstOrDefault(u => u.Id == id);
+            return this.applicationDbContext.Locations.Where(n => n.FullName == name).FirstOrDefault();
         }
 
-        public void InsertItem(Team item)
+        public void InsertItem(Location item)
         {
-            this.applicationDbContext.Teams.Add(item);
+            this.applicationDbContext.Locations.Add(item);
         }
 
-        public void UpdateItem(Team item)
+        public void UpdateItem(Location item)
         {
             var tItem = GetItemByID(item.Id);
 
             if (tItem != null)
             {
-                tItem.Name = item.Name;
-                tItem.IsVisible = item.IsVisible;
+                tItem.FullName = item.FullName;
             }
             else
             {
@@ -54,7 +52,7 @@ namespace SportsNews.Data
         public void DeleteItem(int id)
         {
             var item = GetItemByID(id);
-            this.applicationDbContext.Teams.Remove(item);
+            this.applicationDbContext.Locations.Remove(item);
         }
 
         private bool disposed = false;
@@ -78,3 +76,4 @@ namespace SportsNews.Data
         }
     }
 }
+

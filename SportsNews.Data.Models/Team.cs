@@ -17,10 +17,12 @@ namespace SportsNews.Data.Models
         public int SubCategoryId { get; set; }
         public SubCategory SubCategory { get; set; }
 
-        public IEnumerable<TeamLocation> TeamLocation { get; set; }
+        public int? LocationId { get; set; }
+        public Location Location { get; set; }
 
         public DateTime DateAdded { get; set; }
 
+        public int TeamBadgeId { get; set; }
         public TeamBadge TeamBadge { get; set; }
     }
 }

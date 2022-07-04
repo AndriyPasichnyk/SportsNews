@@ -7,43 +7,42 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Data
 {
-    public class TeamRepository : IItemRepository<Team>
+    public class TeamBadgesRepository : IItemRepository<TeamBadge>
     {
-        internal ApplicationDbContext applicationDbContext;
+        private readonly ApplicationDbContext applicationDbContext;
 
-        public TeamRepository(ApplicationDbContext applicationDbContext)
+        public TeamBadgesRepository(ApplicationDbContext applicationDbContext)
         {
             this.applicationDbContext = applicationDbContext;
         }
 
-        public IEnumerable<Team> GetItems()
+        public IEnumerable<TeamBadge> GetItems()
         {
-            return this.applicationDbContext.Teams.ToList();
+            return this.applicationDbContext.TeamBadges.ToList();
         }
 
-        public IEnumerable<Team> GetItemsBySubCategoryId(int id)
+        public TeamBadge GetItemByID(int id)
         {
-            return this.applicationDbContext.Teams.Where(t => t.SubCategoryId == id).Include("TeamBadge").Include("Location").ToList();
+            return this.applicationDbContext.TeamBadges.Where(b => b.Id == id).FirstOrDefault();
         }
 
-        public Team GetItemByID(int id)
+        public TeamBadge FindItemByID(int id)
         {
-            return this.applicationDbContext.Teams.FirstOrDefault(u => u.Id == id);
+            return this.applicationDbContext.TeamBadges.Include("Team").Where(b => b.Team.Id == id).FirstOrDefault();
         }
 
-        public void InsertItem(Team item)
+        public void InsertItem(TeamBadge item)
         {
-            this.applicationDbContext.Teams.Add(item);
+            this.applicationDbContext.TeamBadges.Add(item);
         }
 
-        public void UpdateItem(Team item)
+        public void UpdateItem(TeamBadge item)
         {
             var tItem = GetItemByID(item.Id);
 
             if (tItem != null)
             {
-                tItem.Name = item.Name;
-                tItem.IsVisible = item.IsVisible;
+                tItem.Badge = item.Badge;
             }
             else
             {
@@ -54,7 +53,7 @@ namespace SportsNews.Data
         public void DeleteItem(int id)
         {
             var item = GetItemByID(id);
-            this.applicationDbContext.Teams.Remove(item);
+            this.applicationDbContext.TeamBadges.Remove(item);
         }
 
         private bool disposed = false;
