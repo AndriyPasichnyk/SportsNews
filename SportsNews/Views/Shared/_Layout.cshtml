@@ -10,11 +10,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
-            <div class="container container-inherit">
-                <a class="navbar-brand" style="color: white; width: inherit; margin-right: unset; font-weight: bold;" asp-area="" asp-controller="Home" asp-action="Index">Sports Hub</a>
-            </div>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="background-color: #e3f2fd;">
             <div class="container">
+                <a class="navbar-brand" style="width: 260px; max-height: 100px;" asp-area="" asp-controller="Home" asp-action="Index">Sports Hub</a>
                 <partial name="_NavigationPartial" />
             </div>
         </nav>
@@ -25,7 +23,7 @@
         {
             if (Model.Menu != null)
             {
-                <div class="col-4" style="max-width: 260px; min-width: 260px; text-align: left">
+                <div class="col-4" style="max-width: 260px; text-align: left">
                     <div class="list-group" id="list-tab" role="tablist">
                         @foreach (var item in Model.Menu)
                         {
@@ -38,38 +36,13 @@
         else if (Model.Title != "LogInAccount" && Model.Title != "CreateAccount" && Model.Title != "ForgotPassword" &&
             Model.Title != "ForgotPasswordConfirmation" && Model.Title != "ResetPassword")
         {
-            <div class="col-4" style="max-width: 275px; min-width: 275px; padding-right: unset; text-align: left ">
+            <div class="col-4" style="max-width: 260px; text-align: left">
                 <div class="list-group" id="list-tab" role="tablist">
-                    <a class="list-group-item list-group-item-action active" id="list-home-list" asp-controller="@ControllersNames.Home" asp-action="Index">HOME</a>
-                    @foreach (var item in Model.UserMenu)
-                    {
-                        if (item.IsVisible)
-                        {
-                            if (item.IsStatic)
-                            {
-                                <a class="list-group-item list-group-item-action" id="list-home-list-@item.Id" asp-controller="@item.Name" asp-action="Index">@item.Name</a>
-                            }
-                            else
-                            {
-                                if (item.Subcategories != null && item.Subcategories.Count() != 0)
-                                {
-                                    <div class="btn-group dropright">
-                                        <button type="button" class="btn btn-light dropdown-toggle" style="text-align: left;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@item.Name</button>
-                                        <div class="dropdown-menu">
-                                            @foreach (var subs in item.Subcategories)
-                                            {
-                                                <a class="dropdown-item" href="#">@subs.Name</a>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <a class="list-group-item list-group-item-action list-group-item-light" id="list-home-list-@item.Id">@item.Name</a>
-                                }
-                            }
-                        }
-                    }
+                    <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home">HOME</a>
+                    <a class="list-group-item list-group-item-action" asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture">TEAM HUB</a>
+                    <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages">LIFESTYLE</a>
+                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">DEALBOOK</a>
+                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings">VIDEO</a>
                 </div>
             </div>
         }
@@ -90,7 +63,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAbunj4Bfz4rlAuB1Ril6g5eJUed5hdVXA"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhp-i8NIWkPgcEyxJ9vp9siz0aTfH8_nY"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

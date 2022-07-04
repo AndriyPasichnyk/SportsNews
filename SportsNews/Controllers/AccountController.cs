@@ -23,7 +23,6 @@ namespace SportsNews.Controllers
         private readonly IUnitOfWork unitOfWork;
         private readonly IEmailService sender;
         private readonly IEnumerable<Language> languages;
-        private readonly IEnumerable<Category> userMenuItems;
 
         public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IUnitOfWork unitOfWork, IEmailService sender)
         {
@@ -32,7 +31,6 @@ namespace SportsNews.Controllers
             this.unitOfWork = unitOfWork;
             this.sender = sender;
             this.languages = this.unitOfWork.Languages.GetItems().ToList();
-            this.userMenuItems = this.unitOfWork.Categories.GetItems().ToList();
         }
 
         [HttpGet]
@@ -120,8 +118,7 @@ namespace SportsNews.Controllers
             };
             var model = new LayoutViewModel<UserInfoViewModel>(innerModel, "Personal Info", false, innerModel.Image)
             {
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
+                Languages = this.languages
             };
 
             return View(model);
@@ -176,36 +173,21 @@ namespace SportsNews.Controllers
         public ActionResult UserPassword()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("Change Password", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
-            {
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
-            };
-            return View(model);
+            return View(new LayoutViewModel("Change Password", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserSurveys()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("My Surveys", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
-            {
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
-            };
-            return View(model);
+            return View(new LayoutViewModel("My Surveys", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]
         public ActionResult UserTeamHub()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
-            {
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
-            };
-            return View(model);
+            return View(new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture));
         }
 
         [HttpGet]

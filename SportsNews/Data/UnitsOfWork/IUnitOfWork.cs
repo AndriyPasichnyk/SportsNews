@@ -13,8 +13,6 @@ namespace SportsNews.Data
         CategoryRepository Categories { get; }
         SubCategoryRepository SubCategories { get; }
         TeamRepository Teams { get; }
-        TeamLocationsRepository TeamLocations { get; }
-        TeamBadgesRepository TeamBadges { get; }
 
         LanguageRepository Languages { get; }
 

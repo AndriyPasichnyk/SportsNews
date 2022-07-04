@@ -21,7 +21,6 @@ namespace SportsNews.Models
         public byte[] UserImg { get; set; }
 
         public IEnumerable<AdminMenu> Menu { get; set; }
-        public IEnumerable<Category> UserMenu { get; set; }
 
         public LayoutViewModel(string title)
         {

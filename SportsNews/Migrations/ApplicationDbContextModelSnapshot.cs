@@ -310,9 +310,21 @@ namespace SportsNews.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Country")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
                     b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(300)")
-                        .HasMaxLength(300);
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(255)")
+                        .HasMaxLength(255);
 
                     b.HasKey("Id");
 
@@ -355,21 +367,13 @@ namespace SportsNews.Migrations
                     b.Property<bool>("IsVisible")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SubCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TeamBadgeId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
 
                     b.HasIndex("SubCategoryId");
 
@@ -396,6 +400,28 @@ namespace SportsNews.Migrations
                         .HasFilter("[TeamId] IS NOT NULL");
 
                     b.ToTable("TeamBadges");
+                });
+
+            modelBuilder.Entity("SportsNews.Data.Models.TeamLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("TeamLocations");
                 });
 
             modelBuilder.Entity("SportsNews.Data.Models.UserPhoto", b =>
@@ -488,7 +514,7 @@ namespace SportsNews.Migrations
             modelBuilder.Entity("SportsNews.Data.Models.SubCategory", b =>
                 {
                     b.HasOne("SportsNews.Data.Models.Category", "Category")
-                        .WithMany("Subcategories")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -496,14 +522,8 @@ namespace SportsNews.Migrations
 
             modelBuilder.Entity("SportsNews.Data.Models.Team", b =>
                 {
-                    b.HasOne("SportsNews.Data.Models.Location", "Location")
-                        .WithMany("Team")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SportsNews.Data.Models.SubCategory", "SubCategory")
-                        .WithMany("Teams")
+                        .WithMany()
                         .HasForeignKey("SubCategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -514,6 +534,21 @@ namespace SportsNews.Migrations
                     b.HasOne("SportsNews.Data.Models.Team", "Team")
                         .WithOne("TeamBadge")
                         .HasForeignKey("SportsNews.Data.Models.TeamBadge", "TeamId");
+                });
+
+            modelBuilder.Entity("SportsNews.Data.Models.TeamLocation", b =>
+                {
+                    b.HasOne("SportsNews.Data.Models.Location", "Location")
+                        .WithMany("TeamLocation")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SportsNews.Data.Models.Team", "Team")
+                        .WithMany("TeamLocation")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
