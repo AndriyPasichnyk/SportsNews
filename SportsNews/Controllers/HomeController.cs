@@ -21,6 +21,7 @@ namespace SportsNews.Controllers
         private readonly IUnitOfWork unitOfWork;
         private readonly IStringLocalizer<HomeController> stringLocalizer;
         private readonly IEnumerable<Language> languages;
+        private readonly IEnumerable<Category> menuItems;
 
         public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, IStringLocalizer<HomeController> stringLocalizer)
         {
@@ -28,6 +29,7 @@ namespace SportsNews.Controllers
             this.unitOfWork = unitOfWork;
             this.stringLocalizer = stringLocalizer;
             this.languages = this.unitOfWork.Languages.GetItems().ToList();
+            this.menuItems = this.unitOfWork.Categories.GetItems().ToList();
         }
 
         public IActionResult Index()
@@ -35,6 +37,7 @@ namespace SportsNews.Controllers
             var model = new LayoutViewModel(this.stringLocalizer["Home Page"], false,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
+                UserMenu = this.menuItems,
                 Languages = this.languages
             };
             return View(model);
@@ -44,7 +47,8 @@ namespace SportsNews.Controllers
         {
             var model = new LayoutViewModel(this.stringLocalizer["Privacy Policy"], false,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
-            { 
+            {
+                UserMenu = this.menuItems,
                 Languages = this.languages 
             };
             return View(model);
@@ -59,9 +63,21 @@ namespace SportsNews.Controllers
                 false,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
+                UserMenu = this.menuItems,
                 Languages = this.unitOfWork.Languages.GetItems()
             };
             return View(model);
+        }
+
+
+        private LayoutViewModel GetComposedUserModel(TeamsViewModel model)
+        {
+            return new LayoutViewModel<TeamsViewModel>(model, "Teams", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                UserMenu = this.menuItems,
+                Languages = this.languages
+            };
         }
     }
 }

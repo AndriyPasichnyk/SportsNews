@@ -15,8 +15,14 @@
     <Compile Remove="Migrations\20220615153244_AddLocationsAndTeamBadgesTables.Designer.cs" />
     <Compile Remove="Migrations\20220615153504_AddLocationsAndTeamBadgesTables.cs" />
     <Compile Remove="Migrations\20220615153504_AddLocationsAndTeamBadgesTables.Designer.cs" />
+    <Compile Remove="Migrations\20220615155842_AddLocationsAndTeamBadgesTables.cs" />
+    <Compile Remove="Migrations\20220615155842_AddLocationsAndTeamBadgesTables.Designer.cs" />
     <Compile Remove="Migrations\20220615172321_test.cs" />
     <Compile Remove="Migrations\20220615172321_test.Designer.cs" />
+    <Compile Remove="Migrations\20220704081030_AddLocationsAndTeamBadgesTables.cs" />
+    <Compile Remove="Migrations\20220704081030_AddLocationsAndTeamBadgesTables.Designer.cs" />
+    <Compile Remove="Migrations\20220704082244_AddLocationsAndTeamBadgesTables.cs" />
+    <Compile Remove="Migrations\20220704082244_AddLocationsAndTeamBadgesTables.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

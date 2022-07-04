@@ -19,6 +19,7 @@ namespace SportsNews.Controllers
         private readonly IOptions<RequestLocalizationOptions> locOptions;
         private readonly IEnumerable<AdminMenu> menuItems;
         private readonly IEnumerable<Language> languages;
+        private readonly IEnumerable<Category> userMenuItems;
 
         public AdminController(IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions)
         {
@@ -26,6 +27,7 @@ namespace SportsNews.Controllers
             this.locOptions = locOptions;
             menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
             languages = this.unitOfWork.Languages.GetItems().ToList();
+            userMenuItems = this.unitOfWork.Categories.GetItems().ToList();
         }
 
         public IActionResult Index()
@@ -34,7 +36,8 @@ namespace SportsNews.Controllers
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
             };
             return View(model);
         }
@@ -56,7 +59,8 @@ namespace SportsNews.Controllers
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
             };
             return View(model);
         }
@@ -90,7 +94,8 @@ namespace SportsNews.Controllers
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
             };
             return View(model);
         }
@@ -361,91 +366,195 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Teams()
         {
-            var modelTeams = new TeamsViewModel
+            var modelTeams = new TeamsExViewModel
             {
                 Categories = unitOfWork.Categories.GetItems(),
                 SubCategories = unitOfWork.SubCategories.GetItems(),
                 Teams = unitOfWork.Teams.GetItems(),
             };
-            var model = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
-                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            return View(GetComposedAdminModel(modelTeams));
+        }
+
+        [HttpGet]
+        [Route("/Admin/Teams/{id}")]
+        public IActionResult Teams(int id, int actionId)
+        {
+            var cat = unitOfWork.Categories.GetItems().ToList();
+            int indC = 0;
+            int indS = 0;
+            int indL = 0;
+            foreach (var i in cat)
             {
-                Menu = this.menuItems,
-                Languages = this.languages
+                foreach (var s in i.Subcategories)
+                {
+                    foreach (var t in s.Teams)
+                    {
+                        if (t.Id == id)
+                        {
+                            indC = i.Id;
+                            indS = s.Id;
+                            indL = t.LocationId ?? 0;
+                        }
+                    }
+                }
+            }
+
+            var modelTeams = new TeamsExViewModel
+            {
+                Categories = unitOfWork.Categories.GetItems(),
+                SubCategories = unitOfWork.SubCategories.GetItems(),
+                Teams = unitOfWork.Teams.GetItems(),
+                SelectedCategory = new AdminMenuItemViewModel { Id = indC },
+                SelectedSubCategory = new AdminMenuItemViewModel { Id = indS },
+                SelectedTeam = new AdminMenuItemViewModel { Id = id, NewName = actionId == 1 ? unitOfWork.Teams.GetItemByID(id).Name : "" },
+                Location = unitOfWork.TeamLocations.GetItemByID(indL),
+                Image = unitOfWork.TeamBadges.FindItemByID(id)?.Badge ?? Array.Empty<byte>(),
+                Edit = actionId == 1
             };
-            return View(model);
+            return View(GetComposedAdminModel(modelTeams));
         }
 
         [HttpPost]
-        public IActionResult Teams(LayoutViewModel<TeamsViewModel> model)
+        public IActionResult CancelEditTeam(LayoutViewModel<TeamsExViewModel> model)
         {
-            var modelTeams = new TeamsViewModel
+            return RedirectToAction("Teams");
+        }
+
+        [HttpPost]
+        public IActionResult Teams(LayoutViewModel<TeamsExViewModel> model)
+        {
+            var modelTeams = new TeamsExViewModel
             {
                 Categories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.Categories.GetItems() : unitOfWork.Categories.GetItemsByID(model.PageModel.SelectedCategory.Id),
                 SubCategories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.SubCategories.GetItems() : unitOfWork.SubCategories.GetItemsByCategoryId(model.PageModel.SelectedCategory.Id),
                 Teams = model.PageModel.SelectedSubCategory.Id == 0 ? unitOfWork.Teams.GetItems() : unitOfWork.Teams.GetItemsBySubCategoryId(model.PageModel.SelectedSubCategory.Id),
                 SelectedCategory = model.PageModel.SelectedCategory,
                 SelectedSubCategory = model.PageModel.SelectedSubCategory,
-                SelectedTeam = model.PageModel.SelectedTeam
+                SelectedTeam = model.PageModel.SelectedTeam,
+                Image = this.unitOfWork.TeamBadges.FindItemByID(model.PageModel.SelectedTeam.Id)?.Badge ?? Array.Empty<byte>()
             };
-            var modelNew = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
-                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
-            {
-                Menu = this.menuItems,
-                Languages = this.languages
-            };
-            return View(modelNew);
+            modelTeams.SelectedTeam.NewName = String.Empty;
+            return View(GetComposedAdminModel(modelTeams));
         }
 
         [HttpPost]
-        public IActionResult AddNewTeamWithDetails(LayoutViewModel<TeamsViewModel> model)
+        public IActionResult AddNewTeamWithDetails(LayoutViewModel<TeamsExViewModel> model)
         {
-            var modelTeams = new TeamsViewModel
+            var modelTeams = new TeamsExViewModel
             {
                 Categories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.Categories.GetItems() : unitOfWork.Categories.GetItemsByID(model.PageModel.SelectedCategory.Id),
                 SubCategories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.SubCategories.GetItems() : unitOfWork.SubCategories.GetItemsByCategoryId(model.PageModel.SelectedCategory.Id),
                 Teams = model.PageModel.SelectedSubCategory.Id == 0 ? unitOfWork.Teams.GetItems() : unitOfWork.Teams.GetItemsBySubCategoryId(model.PageModel.SelectedSubCategory.Id),
                 SelectedCategory = model.PageModel.SelectedCategory,
                 SelectedSubCategory = model.PageModel.SelectedSubCategory,
-                SelectedTeam = model.PageModel.SelectedTeam
+                SelectedTeam = model.PageModel.SelectedTeam,
+                Image = Array.Empty<byte>()
             };
-            var modelNew = new LayoutViewModel<TeamsViewModel>(modelTeams, "Teams", true,
-                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
-            {
-                Menu = this.menuItems,
-                Languages = this.languages
-            };
+            var modelNew = GetComposedAdminModel(modelTeams);
 
-            if (string.IsNullOrEmpty(model.PageModel.SelectedTeam.NewName))
+            if (!model.PageModel.Edit)
             {
-                ModelState.AddModelError("AddNewTeamWithDetails", "Team couldn't be empty!!!");
-            }
-            if (model.PageModel.SelectedCategory.Id== 0)
-            {
-                ModelState.AddModelError("AddNewTeamWithDetails", "Category should be selected for adding new team!");
-            }
-            if (model.PageModel.SelectedSubCategory.Id == 0)
-            {
-                ModelState.AddModelError("AddNewTeamWithDetails", "Subcategory should be selected for adding new team!");
-            }
+                if (string.IsNullOrEmpty(model.PageModel.SelectedTeam.NewName))
+                {
+                    ModelState.AddModelError("AddNewTeamWithDetails", "Team couldn't be empty!!!");
+                }
+                if (model.PageModel.SelectedCategory.Id == 0)
+                {
+                    ModelState.AddModelError("AddNewTeamWithDetails", "Category should be selected for adding new team!");
+                }
+                if (model.PageModel.SelectedSubCategory.Id == 0)
+                {
+                    ModelState.AddModelError("AddNewTeamWithDetails", "Subcategory should be selected for adding new team!");
+                }
 
-            if (!ModelState.IsValid)
-            {
-                return View("Teams", modelNew);
+                if (!ModelState.IsValid)
+                {
+                    return View("Teams", modelNew);
+                }
+
+                this.unitOfWork.Teams.InsertItem(new Team()
+                {
+                    SubCategoryId = model.PageModel.SelectedSubCategory.Id,
+                    Name = model.PageModel.SelectedTeam.NewName,
+                    IsVisible = true,
+                    DateAdded = DateTime.Now
+                });
+                this.unitOfWork.Save();
+
+                modelNew.PageModel.SelectedTeam.NewName = string.Empty;
             }
-
-            this.unitOfWork.Teams.InsertItem(new Team()
+            else
             {
-                SubCategoryId = model.PageModel.SelectedSubCategory.Id,
-                Name = model.PageModel.SelectedTeam.NewName,
-                IsVisible = true,
-                DateAdded = DateTime.Now
-            });
-            this.unitOfWork.Save();
-
-            modelNew.PageModel.SelectedTeam.NewName = string.Empty;
+                return RedirectToAction("Teams");
+            }
 
             return View("Teams", modelNew);
+        }
+
+        [HttpPost]
+        public IActionResult SaveEditedTeamWithDetails(LayoutViewModel<TeamsExViewModel> model)
+        {
+            var modelTeams = new TeamsExViewModel
+            {
+                Categories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.Categories.GetItems() : unitOfWork.Categories.GetItemsByID(model.PageModel.SelectedCategory.Id),
+                SubCategories = model.PageModel.SelectedCategory.Id == 0 ? unitOfWork.SubCategories.GetItems() : unitOfWork.SubCategories.GetItemsByCategoryId(model.PageModel.SelectedCategory.Id),
+                Teams = model.PageModel.SelectedSubCategory.Id == 0 ? unitOfWork.Teams.GetItems() : unitOfWork.Teams.GetItemsBySubCategoryId(model.PageModel.SelectedSubCategory.Id),
+                SelectedCategory = model.PageModel.SelectedCategory,
+                SelectedSubCategory = model.PageModel.SelectedSubCategory,
+                SelectedTeam = model.PageModel.SelectedTeam
+            };
+            var modelNew = GetComposedAdminModel(modelTeams);
+
+            var team = this.unitOfWork.Teams.GetItemByID(model.PageModel.SelectedTeam.Id);
+            team.Name = model.PageModel.SelectedTeam.NewName;
+            this.unitOfWork.Teams.UpdateItem(team);
+
+            var badge = this.unitOfWork.TeamBadges.FindItemByID(model.PageModel.SelectedTeam.Id) ?? new TeamBadge 
+            { 
+                Id = 0, 
+                Team = this.unitOfWork.Teams.GetItemByID(model.PageModel.SelectedTeam.Id)
+            };
+            badge.Badge = ImageHelper.ConvertFileToByteArray(model.PageModel.BadgeImage).Result;
+            this.unitOfWork.TeamBadges.UpdateItem(badge);
+
+            //TODO: SAVE changes fot location :one location- many teams...
+
+//            if (team.Location.FullName != model.PageModel.Location.FullName)
+//            {
+//                var location = this.unitOfWork.TeamLocations.FindItemByName(model.PageModel.Location.FullName) ?? new Location()
+//                {
+//                    Id = 0,
+//                    FullName = model.PageModel.Location.FullName
+//                }
+//}
+            this.unitOfWork.Save();
+            modelNew.PageModel.Image = badge.Badge;
+            return View("Teams", modelNew);
+        }
+
+        [HttpPost]
+        public IActionResult DeleteSelectedTeam(LayoutViewModel<TeamsExViewModel> model)
+        {
+            var badge = this.unitOfWork.TeamBadges.FindItemByID(model.PageModel.SelectedTeam.Id);
+            if (badge != null)
+            {
+                this.unitOfWork.TeamBadges.DeleteItem(badge.Id);
+            }
+            this.unitOfWork.Teams.DeleteItem(model.PageModel.SelectedTeam.Id);
+            this.unitOfWork.Save();
+
+            return RedirectToAction("Teams");
+        }
+
+        private LayoutViewModel<TeamsExViewModel> GetComposedAdminModel(TeamsExViewModel model)
+        {
+            return new LayoutViewModel<TeamsExViewModel>(model, "Teams", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
+            };
         }
         #endregion
 
@@ -465,7 +574,8 @@ namespace SportsNews.Controllers
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
             };
             return View(model);
         }

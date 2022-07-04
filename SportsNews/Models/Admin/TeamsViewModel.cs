@@ -8,8 +8,6 @@ namespace SportsNews.Models
 {
     public class TeamsViewModel
     {
-        public IEnumerable<Location> Locations { get; set; }
-
         public IEnumerable<Category> Categories { get; set; }
 
         public IEnumerable<SubCategory> SubCategories { get; set; }
@@ -21,6 +19,5 @@ namespace SportsNews.Models
         public AdminMenuItemViewModel SelectedSubCategory { get; set; }
 
         public AdminMenuItemViewModel SelectedTeam { get; set; }
-
     }
 }
