@@ -15,12 +15,14 @@ namespace SportsNews.Data
         {
         }
 
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
-        //    builder.Entity<UserPhoto>().Property(t => t.UserId).HasColumnType("UniqueIdentifier");
-        //}
+            //Seeding definition by Configuration - need migration for this
+            //builder.ApplyConfiguration(new LanguageConfiguration());
+
+        }
 
         // for User Profile images
         public DbSet<UserPhoto> UserPhotos { get; set; }
@@ -33,9 +35,13 @@ namespace SportsNews.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<Article> Articles { get; set; }
 
+        public DbSet<TeamBadge> TeamBadges { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
         // for Menus
         public DbSet<AdminMenu> AdminMenuItems { get; set; }
+
+
 
         //        public DbSet<SocialNetwork> SocialNetworks { get; set; }
 

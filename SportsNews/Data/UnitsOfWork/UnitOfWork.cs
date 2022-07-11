@@ -14,6 +14,9 @@ namespace SportsNews.Data
         private TeamRepository teamRepository;
         private IUserPhotoRepository userPhotoRepository;
         private AdminMenuRepository adminMenuRepository;
+        private LanguageRepository languageRepository;
+        private TeamLocationsRepository teamLocationsRepository;
+        private TeamBadgesRepository teamBadgesRepository;
 
         public UnitOfWork(ApplicationDbContext applicationDbContext)
         {
@@ -77,6 +80,41 @@ namespace SportsNews.Data
                     this.teamRepository = new TeamRepository(applicationDbContext);
                 }
                 return teamRepository;
+            }
+        }
+
+        public LanguageRepository Languages
+        {
+            get
+            {
+                if (this.languageRepository == null)
+                {
+                    this.languageRepository = new LanguageRepository(applicationDbContext);
+                }
+                return languageRepository;
+            }
+        }
+        public TeamLocationsRepository TeamLocations 
+        {
+            get 
+            {
+                if (this.teamLocationsRepository == null)
+                {
+                    this.teamLocationsRepository = new TeamLocationsRepository(applicationDbContext);
+                }
+                return teamLocationsRepository; 
+            }
+        }
+
+        public TeamBadgesRepository TeamBadges 
+        {
+            get
+            {
+                if (this.teamBadgesRepository == null)
+                {
+                    this.teamBadgesRepository = new TeamBadgesRepository(applicationDbContext);
+                }
+                return teamBadgesRepository;
             }
         }
 

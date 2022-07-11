@@ -5,105 +5,115 @@
     ViewData["Title"] = "Administration zone";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-Todo.... Edit, Delit, Move ??? (Category, SubCategory, Team)
-
 <partial name="_AddAdminMenuItemsPartial" />
 <partial name="_EditAdminMenuItemsPartial" />
 <partial name="_DeleteAdminMenuItemsPartial" />
-<table class="table-sm" border="1">
-    <thead>
-        <tr>
-            <td align="center">
-                <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddCategoryModal">+ Add category</button>
-            </td>
-            <td align="center">
-                @if (Model.PageModel.SelectedCategory.Id != 0)
+<div class="container" style="display: flex;">
+    <div class="container" style="min-width: 260px; max-width: 260px; align-content: center;">
+        <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddCategoryModal">+ Add category</button>
+    </div>
+    <div class="container" style="min-width: 260px; max-width: 260px; align-content: center;">
+        @if (Model.PageModel.SelectedCategory.Id != 0)
+        {
+            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddSubCategoryModal">+ Add subcategory</button>
+        }
+    </div>
+    <div class="container" style="min-width: 260px; max-width: 260px; align-content: center;">
+        @if (Model.PageModel.SelectedSubCategory.Id != 0)
+        {
+            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddTeamModal">+ Add team</button>
+        }
+    </div>
+</div>
+<div class="container" style="display: flex;">
+    <div class="container" style="flex-direction:column; min-width: 260px; max-width: 260px; padding-right: 0; padding-left: 0;">
+            @foreach (var item in Model.PageModel.Categories)
+            {
+                <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
+                    <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedCategory.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
+                       asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-id="@item.Id">
+                        @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span>
+                    </a>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-success @(Model.PageModel.SelectedCategory.Id == item.Id ? string.Empty : "disabled")"
+                                type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ...
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            @if (!item.IsStatic)
+                            {
+                                <button class="dropdown-item" data-toggle="modal" data-target="#DeleteCategoryModal">Delete</button>
+                                <button class="dropdown-item" data-toggle="modal" data-target="#EditCategoryModal">Edit</button>
+                            }
+                            <form method="post">
+                                <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
+                                <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideCategory">@(item.IsVisible ? "Hide" : "Show")</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+    </div>
+    <div class="container" style="flex-direction: column; min-width: 260px; max-width: 260px;padding-right: 0; padding-left: 0;">
+            @if (Model.PageModel.SelectedCategory.Id != 0)
+            {
+                foreach (var item in Model.PageModel.SubCategories)
                 {
-                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddSubCategoryModal">+ Add subcategory</button>
-                }
-            </td>
-            <td align="center">
-                @if (Model.PageModel.SelectedSubCategory.Id != 0)
-                {
-                    <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#AddTeamModal">+ Add team</button>
-                }
-            </td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                @foreach (var item in Model.PageModel.Categories)
-                {
-                    <div class="list-group-item" style="display: flex;">
-                        <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedCategory.Id == item.Id ? "active" : string.Empty)"
-                           style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-id="@item.Id">@item.Name</a>
+                    <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
+                        <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedSubCategory.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
+                           asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-subId="@item.Id">
+                            @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span>
+                        </a>
                         <div class="btn-group">
-                            <button class="btn btn-outline-success @(Model.PageModel.SelectedCategory.Id == item.Id ? string.Empty : "disabled")"
+                            <button class="btn btn-outline-success @(Model.PageModel.SelectedSubCategory.Id == item.Id ? string.Empty : "disabled")"
                                     type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 ...
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                @if (!item.IsStatic)
-                                {
-                                    <button class="dropdown-item" data-toggle="modal" data-target="#DeleteCategoryModal">Delete</button>
-                                    <button class="dropdown-item" data-toggle="modal" data-target="#EditCategoryModal">Edit</button>
-                                }
-                                <a class="dropdown-item" href="#">Hide</a>
+                                <button class="dropdown-item" data-toggle="modal" data-target="#DeleteSubCategoryModal">Delete</button>
+                                <button class="dropdown-item" data-toggle="modal" data-target="#EditSubCategoryModal">Edit</button>
+                                <form method="post">
+                                    <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
+                                    <input type="hidden" asp-for="PageModel.SelectedSubCategory.Id" />
+                                    <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideSubCategory">@(item.IsVisible ? "Hide" : "Show")</button>
+                                </form>
+                                <a class="dropdown-item" href="#">Move</a>
                             </div>
                         </div>
                     </div>
                 }
-            </td>
-            <td>
-                @if (Model.PageModel.SelectedCategory.Id != 0)
-                {
-                    foreach (var item in Model.PageModel.SubCategories)
-                    {
-                        <div class="list-group-item" style="display: flex;">
-                            <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedSubCategory.Id == item.Id ? "active" : string.Empty)"
-                               style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@item.Id">@item.Name</a>
-                            <div class="btn-group">
-                                <button class="btn btn-outline-success @(Model.PageModel.SelectedSubCategory.Id == item.Id ? string.Empty : "disabled")"
-                                        type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    ...
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" data-toggle="modal" data-target="#DeleteSubCategoryModal">Delete</a>
-                                    <a class="dropdown-item" data-toggle="modal" data-target="#EditSubCategoryModal">Edit</a>
-                                    <a class="dropdown-item" href="#">Hide</a>
-                                    <a class="dropdown-item" href="#">Move</a>
-                                </div>
-                            </div>
+            }
+    </div>
+    <div class="container" style="flex-direction: column; min-width: 260px; max-width: 260px; padding-right: 0; padding-left: 0;">
+        @if (Model.PageModel.SelectedSubCategory.Id != 0)
+        {
+            foreach (var item in Model.PageModel.Teams)
+            {
+                <div class="list-group-item" style="display: flex; padding-top: 5px; padding-bottom: 5px; padding-right: 5px; padding-left: 5px; border-right-width: 0px; border-top-width: 0px; border-left-width: 0px; border-bottom-width: 0px;">
+                    <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedTeam.Id == item.Id ? "active" : string.Empty)" style="margin-right: 5px;" 
+                       asp-controller="@ControllersNames.Admin" asp-action="InfoArchitecture" asp-route-subId="@Model.PageModel.SelectedSubCategory.Id" asp-route-tId="@item.Id">
+                        @item.Name<span style="font-size: x-small; color: crimson;"><strong>@(item.IsVisible ? string.Empty : " (Hidden)")</strong></span> 
+                    </a>
+                    <a style="font-size:x-small"></a>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-success @(Model.PageModel.SelectedTeam.Id == item.Id ? string.Empty : "disabled")"
+                                type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            ...
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item" data-toggle="modal" data-target="#DeleteTeamModal">Delete</button>
+                            <button class="dropdown-item" data-toggle="modal" data-target="#EditTeamModal">Edit</button>
+                            <form method="post">
+                                <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
+                                <input type="hidden" asp-for="PageModel.SelectedSubCategory.Id" />
+                                <input type="hidden" asp-for="PageModel.SelectedTeam.Id" />
+                                <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideTeam">@(item.IsVisible ? "Hide" : "Show")</button>
+                            </form>
+                            <a class="dropdown-item" href="#">Move</a>
                         </div>
-                    }
-                }
-            </td>
-            <td>
-                @if (Model.PageModel.SelectedSubCategory.Id != 0)
-                {
-                    foreach (var item in Model.PageModel.Teams)
-                    {
-                        <div class="list-group-item" style="display: flex;">
-                            <a class="list-group-item list-group-item-action @(Model.PageModel.SelectedTeam.Id == item.Id ? "active" : string.Empty)"
-                               style="margin-right: 5px;" asp-controller="Admin" asp-action="InfoArchitecture" asp-route-subId="@Model.PageModel.SelectedSubCategory.Id" asp-route-tId="@item.Id">@item.Name</a>
-                            <div class="btn-group">
-                                <button class="btn btn-outline-success @(Model.PageModel.SelectedTeam.Id == item.Id ? string.Empty : "disabled")"
-                                        type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    ...
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" data-toggle="modal" data-target="#DeleteTeamModal">Delete</a>
-                                    <a class="dropdown-item" data-toggle="modal" data-target="#EditTeamModal">Edit</a>
-                                    <a class="dropdown-item" href="#">Hide</a>
-                                    <a class="dropdown-item" href="#">Move</a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-            </td>
-        </tr>
-    </tbody>
-</table>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

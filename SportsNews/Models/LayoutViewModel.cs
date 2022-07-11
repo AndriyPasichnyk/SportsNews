@@ -1,6 +1,7 @@
 ﻿using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,9 +12,16 @@ namespace SportsNews.Models
         public string Title { get; set; }
         public bool IsAdminMode { get; set; }
 
+        public string Language { 
+            get
+            { return CultureInfo.CurrentCulture.Name.ToUpper(); }
+        }
+        public IEnumerable<Language> Languages { get; set; }
+
         public byte[] UserImg { get; set; }
 
         public IEnumerable<AdminMenu> Menu { get; set; }
+        public IEnumerable<Category> UserMenu { get; set; }
 
         public LayoutViewModel(string title)
         {

@@ -18,12 +18,17 @@ namespace SportsNews.Data
 
         public IEnumerable<Category> GetItems()
         {
-            return this.applicationDbContext.Categories.ToList();
+            return applicationDbContext.Categories.Include("Subcategories.Teams").ToList();
         }
 
         public Category GetItemByID(int id)
         {
-            return this.applicationDbContext.Categories.FirstOrDefault(u => u.Id == id);
+            return this.applicationDbContext.Categories.Include("Subcategories.Teams").FirstOrDefault(u => u.Id == id);
+        }
+
+        public IEnumerable<Category> GetItemsByID(int id)
+        {
+            return this.applicationDbContext.Categories.Where(u => u.Id == id).Include("Subcategories.Teams").ToList();
         }
 
         public void InsertItem(Category item)
