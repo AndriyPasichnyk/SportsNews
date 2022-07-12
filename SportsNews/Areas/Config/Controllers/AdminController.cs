@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Controllers
 {
+    [Authorize(Policy = Policies.Admins)]
+    [GlobalExceptionFilter]
+    [Area("Config")]
     public class AdminController : Controller
     {
         private readonly IUnitOfWork unitOfWork;
@@ -66,7 +70,7 @@ namespace SportsNews.Controllers
         }
 
         [HttpGet]
-        [Route("/Admin/InfoArchitecture/{id}")]
+        [Route("/Config/Admin/InfoArchitecture/{id}")]
         public IActionResult InfoArchitecture(int id, int subId, int tId)
         {
             var modelInfo = new InfoArchitectureViewModel
@@ -376,7 +380,7 @@ namespace SportsNews.Controllers
         }
 
         [HttpGet]
-        [Route("/Admin/Teams/{id}")]
+        [Route("/Config/Admin/Teams/{id}")]
         public IActionResult Teams(int id, int actionId)
         {
             var cat = unitOfWork.Categories.GetItems().ToList();
@@ -509,9 +513,9 @@ namespace SportsNews.Controllers
             team.Name = model.PageModel.SelectedTeam.NewName;
             this.unitOfWork.Teams.UpdateItem(team);
 
-            var badge = this.unitOfWork.TeamBadges.FindItemByID(model.PageModel.SelectedTeam.Id) ?? new TeamBadge 
-            { 
-                Id = 0, 
+            var badge = this.unitOfWork.TeamBadges.FindItemByID(model.PageModel.SelectedTeam.Id) ?? new TeamBadge
+            {
+                Id = 0,
                 Team = this.unitOfWork.Teams.GetItemByID(model.PageModel.SelectedTeam.Id)
             };
             badge.Badge = ImageHelper.ConvertFileToByteArray(model.PageModel.BadgeImage).Result;
@@ -519,14 +523,14 @@ namespace SportsNews.Controllers
 
             //TODO: SAVE changes fot location :one location- many teams...
 
-//            if (team.Location.FullName != model.PageModel.Location.FullName)
-//            {
-//                var location = this.unitOfWork.TeamLocations.FindItemByName(model.PageModel.Location.FullName) ?? new Location()
-//                {
-//                    Id = 0,
-//                    FullName = model.PageModel.Location.FullName
-//                }
-//}
+            //            if (team.Location.FullName != model.PageModel.Location.FullName)
+            //            {
+            //                var location = this.unitOfWork.TeamLocations.FindItemByName(model.PageModel.Location.FullName) ?? new Location()
+            //                {
+            //                    Id = 0,
+            //                    FullName = model.PageModel.Location.FullName
+            //                }
+            //}
             this.unitOfWork.Save();
             modelNew.PageModel.Image = badge.Badge;
             return View("Teams", modelNew);
@@ -566,7 +570,7 @@ namespace SportsNews.Controllers
         }
 
         [HttpGet]
-        [Route("/Admin/Languages/{id}")]
+        [Route("/Config/Admin/Languages/{id}")]
         public IActionResult Languages(int id)
         {
             var lModel = id == 0 ? new Language() : unitOfWork.Languages.GetItemByID(id);
@@ -658,6 +662,112 @@ namespace SportsNews.Controllers
         }
         #endregion
 
+        #region Articles
+        [HttpGet]
+        [Route("/Config/Admin/Articles/{id}")]
+        public IActionResult Articles(int id)
+        {
+            //TODO: seclest all articles for selected Category
+            var model = new LayoutViewModel("Articles", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult AddNewArticle()
+        {
+            var model = new LayoutViewModel("NewArticle", true,
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages,
+                UserMenu = this.userMenuItems
+            };
+
+            return View(model);
+        }
+
+        #endregion
+
+        #region Surveys
+        [HttpGet]
+        public IActionResult Survey()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Banners
+        [HttpGet]
+        public IActionResult Banner()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Footer
+        [HttpGet]
+        public IActionResult Footer()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Social Networks
+        [HttpGet]
+        public IActionResult SocialNetwork()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Users
+        [HttpGet]
+        public IActionResult Users()
+        {
+            return View();
+        }
+        #endregion
+
+        #region News Partners
+        [HttpGet]
+        public IActionResult NewsPartner()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Advertising
+        [HttpGet]
+        public IActionResult Advertising()
+        {
+            return View();
+        }
+        #endregion
+
+        [HttpGet]
+        public PartialViewResult GetUpdatePartial()
+        {
+            return PartialView("_UpdatePartialView");
+        }
+
+        [HttpGet]
+        public PartialViewResult GetInsertPartial()
+        {
+            return PartialView("_InsertPartialView");
+        }
+
+
 
     }
 }
+
+
+
+

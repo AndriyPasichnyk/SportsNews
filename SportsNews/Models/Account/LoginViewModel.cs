@@ -4,11 +4,12 @@ namespace SportsNews.Models
 {
     public class LoginViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
+        [Required(ErrorMessage = "The E-mail is required for login.")]
+        [Display(Name = "E-mail")]
+        [EmailAddress(ErrorMessage = "The E-mail field is not a valid e-mail address.")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "The Password is required for login.")]
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }

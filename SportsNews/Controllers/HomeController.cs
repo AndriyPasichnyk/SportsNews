@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Controllers
 {
+    [Authorize(Policy = Policies.All)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
@@ -32,6 +33,7 @@ namespace SportsNews.Controllers
             this.menuItems = this.unitOfWork.Categories.GetItems().ToList();
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var model = new LayoutViewModel(this.stringLocalizer["Home Page"], false,

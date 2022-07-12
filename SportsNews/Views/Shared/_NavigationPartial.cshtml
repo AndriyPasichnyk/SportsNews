@@ -4,49 +4,32 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    if (!Model.IsAdminMode)
+    <form class="form-inline my-2 my-lg-0" style="text-align: left;">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">...</button>
+    </form>
+    <div class="mr-2" style="text-align: left;">
+        Social media section
+    </div>
+    if (User.IsInRole(Roles.Administrator))
     {
-        <form class="form-inline my-2 my-lg-0" style="text-align: left;">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">...</button>
-        </form>
-        @*<div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                </ul>
-            </div>*@
-        <div class="mr-2" style="text-align: left;">
-            Social media section
-        </div>
-        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="@ControllersNames.Admin" asp-action="Index">=>A</a>
-    }
-    else
-    {
-        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-controller="@ControllersNames.Home" asp-action="Index">=>U</a>
+        <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-area="Config" asp-controller="@ControllersNames.Admin" asp-action="Index">=>A</a>
     }
     <div class="dropdown" style="text-align: right;">
         <form method="post" class="form-inline" asp-controller="@ControllersNames.Account" asp-action="Logout">
             <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <img class="img-responsive" alt="" src="@string.Format("data:image/png;base64,{0}",@Convert.ToBase64String(Model.UserImg))" width="32" height="32" />
-                @HTMLUserHelper.GetUserFullNameFromClaims(Html, User, Model.IsAdminMode)  
+                @HTMLUserHelper.GetUserFullNameWithRoleFromClaims(Html, User)
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <h6 class="dropdown-header">
                     <p>@HTMLUserHelper.GetUserFullNameFromClaims(Html, User)</p>
                     <p style="font-size: x-small">@User.Identity.Name</p>
                 </h6>
-                @if (!Model.IsAdminMode)
-                {
-                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="PersonalInfo">@Localizer["View profile"]</a>
-                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="ChangePassword">@Localizer["Change password"]</a>
-                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserSurveys">@Localizer["My surveys"]</a>
-                    <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserTeamHub">@Localizer["Team hub"]</a>
-                }
+                <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="PersonalInfo">@Localizer["View profile"]</a>
+                <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="ChangePassword">@Localizer["Change password"]</a>
+                <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserSurveys">@Localizer["My surveys"]</a>
+                <a class="dropdown-item" asp-controller="@ControllersNames.Account" asp-action="UserTeamHub">@Localizer["Team hub"]</a>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item" type="submit" asp-controller="@ControllersNames.Account" asp-action="Logout">@Localizer["Log out"]</button>
             </div>
@@ -75,20 +58,20 @@ else
     if (Model.Title == "Create Account")
     {
         <div class="container" style="text-align: right;">
-            Already Have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="Login">Log in</a>
+            @Localizer["Already Have an account?"] <a class="btn btn - outline - success" style="margin - right: 5px; " asp-controller="@ControllersNames.Account" asp-action="Login">@Localizer["Log in"]</a>
         </div>
     }
     else if (Model.Title == "Log in to Sports News")
     {
         <div class="container" style="text-align: right;">
-            Don't have an account? <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="RegisterUser">Get Started</a>
+            @Localizer["Don't have an account?"] <a class="btn btn - outline - success" style="margin - right: 5px; " asp-controller="@ControllersNames.Account" asp-action="RegisterUser">@Localizer["Get Started"]</a>
         </div>
     }
     else
     {
         <div class="container" style="text-align: right;">
-            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="RegisterUser">Sign Up</a>
-            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="Login">Log in</a>
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="RegisterUser">@Localizer["Sign Up"]</a>
+            <a class="btn btn-outline-success" style="margin-right: 5px;" asp-controller="@ControllersNames.Account" asp-action="Login">@Localizer["Log in"]</a>
         </div>
     }
 }

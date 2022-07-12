@@ -93,8 +93,9 @@ namespace SportsNews.Controllers
 
             if (result.Succeeded)
             {
-                await this.userManager.AddClaimAsync(user, claimFN);
-                await this.userManager.AddClaimAsync(user, claimLN);
+                await this.userManager.AddClaimsAsync(user, new List<Claim> { claimFN, claimLN });
+                await this.userManager.AddToRoleAsync(user, Roles.User);
+
                 return RedirectToAction("Index", "Home");
             }
             else
