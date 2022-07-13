@@ -23,6 +23,8 @@ namespace SportsNews.Controllers
         [Route("/Language/Change/{id}")]
         public IActionResult Change(int id)
         {
+            string referer = HttpContext.Request.Headers["Referer"].ToString();
+
             var culture = unitOfWork.Languages.GetItemByID(id);
 
             Response.Cookies.Append(
@@ -30,6 +32,11 @@ namespace SportsNews.Controllers
                 CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture.Abbreviation.ToLower())),
                 new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
                 );
+
+            if (!string.IsNullOrEmpty(referer))
+            {
+                return Redirect(referer);
+            }
 
             return RedirectToAction("Index", "Home");
         }

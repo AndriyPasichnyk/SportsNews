@@ -1,0 +1,15 @@
+﻿@model IEnumerable<Category>
+
+<div>
+    <ul class="nav">
+        <li class="nav-item">
+            <a class="nav-link active" asp-area="Config" asp-controller="@ControllersNames.Admin" asp-action="Index">Home</a>
+        </li>
+        @foreach (var item in Model)
+        {
+            <li class="nav-item">
+                <a class="nav-link" asp-area="Config" asp-controller="@ControllersNames.Admin" asp-action="Articles" asp-route-id="@item.Id">@item.Name</a>
+            </li>
+        }
+    </ul>
+</div>

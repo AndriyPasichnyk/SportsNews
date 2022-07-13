@@ -52,10 +52,21 @@ namespace SportsNews
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
 //                options.User.RequireUniqueEmail = true;
 //                options.SignIn.RequireConfirmedEmail = true;
-            })
+            })             
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminsOnly", policy =>
+                {
+                    policy.RequireRole(Roles.Administrator);
+                });
+                options.AddPolicy("AllUsers", policy =>
+                {
+                    policy.RequireRole(new List<string>() { Roles.Administrator, Roles.User });
+                });
+            });
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddTransient<IEmailService, EmailService>();
@@ -108,6 +119,10 @@ namespace SportsNews
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapAreaControllerRoute(
+                    name: "AreaConfiguration",
+                    areaName: "Config",
+                    pattern: "Config/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

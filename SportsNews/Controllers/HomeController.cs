@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Localization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace SportsNews.Controllers
 {
+    [Authorize(Policy = Policies.All)]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
@@ -32,9 +33,10 @@ namespace SportsNews.Controllers
             this.menuItems = this.unitOfWork.Categories.GetItems().ToList();
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
-            var model = new LayoutViewModel(this.stringLocalizer["Home Page"], false,
+            var model = new LayoutViewModel(this.stringLocalizer["Home Page"], 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 UserMenu = this.menuItems,
@@ -45,7 +47,7 @@ namespace SportsNews.Controllers
 
         public IActionResult Privacy()
         {
-            var model = new LayoutViewModel(this.stringLocalizer["Privacy Policy"], false,
+            var model = new LayoutViewModel(this.stringLocalizer["Privacy Policy"],
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 UserMenu = this.menuItems,
@@ -60,24 +62,12 @@ namespace SportsNews.Controllers
             var model = new LayoutViewModel<ErrorViewModel>(
                 new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier },
                 stringLocalizer["Error"], 
-                false,
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 UserMenu = this.menuItems,
                 Languages = this.unitOfWork.Languages.GetItems()
             };
             return View(model);
-        }
-
-
-        private LayoutViewModel GetComposedUserModel(TeamsViewModel model)
-        {
-            return new LayoutViewModel<TeamsViewModel>(model, "Teams", true,
-                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
-            {
-                UserMenu = this.menuItems,
-                Languages = this.languages
-            };
         }
     }
 }

@@ -7,7 +7,7 @@ namespace SportsNews
 {
     public static class HTMLUserHelper
     {
-        public static HtmlString GetUserFullNameFromClaims(this IHtmlHelper html, ClaimsPrincipal user, bool isAdminMode)
+        public static HtmlString GetUserFullNameWithRoleFromClaims(this IHtmlHelper html, ClaimsPrincipal user)
         {
             var claimFN = user.Claims.FirstOrDefault(x => x.Type == Claims.FirstName);
             string firstName = claimFN != null ? claimFN.Value : string.Empty;
@@ -15,7 +15,7 @@ namespace SportsNews
             var claimLN = user.Claims.FirstOrDefault(x => x.Type == Claims.LastName);
             string lastName = claimLN != null ? claimLN.Value : string.Empty;
 
-            string admin = isAdminMode ? " (Administrator)" : string.Empty;
+            string admin = user.IsInRole(Roles.Administrator) ? @"<br><text style=""font-size: xx-small;"">(Administrator)</text>" : string.Empty;
 
             return new HtmlString($"{firstName} {lastName}{admin}");
         }
