@@ -1,0 +1,48 @@
+﻿@model LayoutViewModel
+
+<div class="container" style="display:flex;">
+    <h2 style="align-self:center;">@Model.Title</h2>
+    <div class="container" style="align-self: center; text-align: end;">
+        <button type="submit" class="btn-dark" style="width: 180px; border: none; background-color: red;" id="team-add-btn"
+                asp-controller="@ControllersNames.Admin" asp-action="AddNewArticle">
+            + New Article
+        </button>
+    </div>
+</div>
+<hr>
+
+SUBCATEGORIES
+TEAMS
+
+LIST OF ARTICLES with publish checkbox
+
+
+<div id="partialDiv">
+    TEST
+</div>
+
+<a asp-action="GetUpdatePartial" asp-controller="Admin"
+   data-target="partialDiv" id="aUpdate">Update</a>
+<a asp-action="GetInsertPartial" asp-controller="Admin"
+   data-target="partialDiv" id="aInsert">Insert</a>
+
+
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#aUpdate").click(function (e) {
+                e.preventDefault();
+                $('#' + $(this).data("target")).load($(this).attr("href"));
+            });
+        });
+        $(function () {
+            $("#aInsert").click(function (e) {
+                e.preventDefault();
+                $('#' + $(this).data("target")).load($(this).attr("href"));
+            });
+        });
+
+    </script>
+}

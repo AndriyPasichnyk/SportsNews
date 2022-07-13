@@ -1,0 +1,95 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model LayoutViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3">
+            <div class="container container-inherit">
+                <a class="navbar-brand" style="color: white; width: inherit; margin-right: unset; font-weight: bold;" asp-area="" asp-controller="Home" asp-action="Index">Sports Hub</a>
+            </div>
+            <div class="container">
+                <a class="btn btn-outline-success" style="text-align: right; margin-right: 5px;" asp-area="" asp-controller="@ControllersNames.Home" asp-action="Index">=>U</a>
+                <div class="dropdown" style="text-align: right;">
+                    <form method="post" class="form-inline" asp-area="" asp-controller="@ControllersNames.Account" asp-action="Logout">
+                        <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="img-responsive" alt="" src="@string.Format("data:image/png;base64,{0}",@Convert.ToBase64String(Model.UserImg))" width="32" height="32" />
+                            @HTMLUserHelper.GetUserFullNameWithRoleFromClaims(Html, User)
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <h6 class="dropdown-header">
+                                <p>@HTMLUserHelper.GetUserFullNameFromClaims(Html, User)</p>
+                                <p style="font-size: x-small">@User.Identity.Name</p>
+                            </h6>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" type="submit" asp-area="" asp-controller="@ControllersNames.Account" asp-action="Logout">@Localizer["Log out"]</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="dropdown" style="text-align: right;">
+                    <button class="btn btn-outline-success dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @Model.Language
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        @if (@Model.Languages != null)
+                        {
+                            foreach (var item in Model.Languages)
+                            {
+                                if (item.IsEnabled)
+                                {
+                                    <a class="dropdown-item" asp-controller="@ControllersNames.Language" asp-action="Change" asp-route-id="@item.Id">@item.Abbreviation</a>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    @await Component.InvokeAsync("AdminContentMenu")
+
+    <div class="container" style="display: flex;">
+        @if (Model.Menu != null)
+        {
+            <div class="col-4" style="max-width: 260px; min-width: 260px; text-align: left">
+                <div class="list-group" id="list-tab" role="tablist">
+                    @foreach (var item in Model.Menu)
+                    {
+                        <a class="list-group-item list-group-item-action @(Model.Title == item.Title ? "active" : string.Empty)" asp-controller="@ControllersNames.Admin" asp-action="@item.Action">@item.Title</a>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            Copyright &copy; 2022 Sports News
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy / Terms</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/index.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&v=weekly" defer></script>
+    <partial name="_ValidationScriptsPartial" />
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

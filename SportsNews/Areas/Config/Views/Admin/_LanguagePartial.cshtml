@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model LayoutViewModel<Language>
+
+<div class="modal fade" id="DeleteLanguageModal" tabindex="-1" role="dialog" aria-labelledby="deleteLanguageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["Delete language"]</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">
+                            @Localizer["Are you sure you want to delete"] "@Model.PageModel.Name" @Localizer["language?"]
+                        </label>
+                        <input type="hidden" asp-for="PageModel.Id" />
+                        <input type="hidden" asp-for="Title" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary" id="delete-language-button" asp-controller="@ControllersNames.Admin" asp-action="DeleteLanguage">@Localizer["Delete"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="AddLanguageModal" tabindex="-1" role="dialog" aria-labelledby="addLanguageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">@Localizer["Add new language"]</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">
+                            @Localizer["Name:"]
+                        </label>
+                        <input type="text" class="form-control" id="add-category-name" asp-for="PageModel.Name" />
+                        <label for="recipient-name" class="col-form-label">
+                            @Localizer["Culture:"]
+                        </label>
+                        <input type="text" class="form-control" id="add-category-name" asp-for="PageModel.Abbreviation" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary" id="add-language-button" asp-controller="@ControllersNames.Admin" asp-action="AddLanguage">@Localizer["Add"]</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

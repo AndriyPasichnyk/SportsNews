@@ -1,44 +1,56 @@
 ﻿@using SportsNews.Models
-@model UserInfoViewModel
+@model LayoutViewModel<UserInfoViewModel>
 @{
     ViewData["Title"] = "Personal Info";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>PersonalInfo</h1>
+<p>
+    <h3>@Model.Title</h3>
+</p>
 <div class="container border" style="padding:20px">
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         <div class="text-danger" asp-validation-summary="All"></div>
-        <div class="form-group row">
-            <div class="col-2">
-                <label asp-for="FirstName"></label>
-            </div>
+
+        <div class="container" style="text-align: center;">
+            <img src="@string.Format("data:image/png;base64,{0}", @Convert.ToBase64String(Model.PageModel.Image))" width="300" height="300" />
+        </div>
+        <div class="form-group" style="text-align: center;">
             <div class="col">
-                <input type="text" asp-for="FirstName" class="form-control" />
+                <input asp-for="PageModel.ProfileImage" />
             </div>
-            <span class="text-danger" asp-validation-for="FirstName"></span>
+            <span class="text-danger" asp-validation-for="PageModel.ProfileImage"></span>
         </div>
         <div class="form-group row">
             <div class="col-2">
-                <label asp-for="LastName"></label>
+                <label asp-for="PageModel.FirstName"></label>
             </div>
             <div class="col">
-                <input type="text" asp-for="LastName" class="form-control" />
+                <input type="text" asp-for="PageModel.FirstName" class="form-control" />
             </div>
-            <span class="text-danger" asp-validation-for="LastName"></span>
+            <span class="text-danger" asp-validation-for="PageModel.FirstName"></span>
         </div>
         <div class="form-group row">
             <div class="col-2">
-                <label asp-for="Email"></label>
+                <label asp-for="PageModel.LastName"></label>
             </div>
             <div class="col">
-                <input type="text" asp-for="Email" class="form-control" />
+                <input type="text" asp-for="PageModel.LastName" class="form-control" />
             </div>
-            <span class="text-danger" asp-validation-for="Email"></span>
+            <span class="text-danger" asp-validation-for="PageModel.LastName"></span>
         </div>
         <div class="form-group row">
             <div class="col-2">
-                <input type="submit" class="btn btn-primary" asp-controller="Account" asp-action="PersonalInfo" name="Update Profile"/>
+                <label asp-for="PageModel.Email"></label>
+            </div>
+            <div class="col">
+                <input type="text" asp-for="PageModel.Email" class="form-control" />
+            </div>
+            <span class="text-danger" asp-validation-for="PageModel.Email"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <input type="submit" class="btn btn-primary" asp-controller="Account" asp-action="PersonalInfo" value="Update Profile" />
             </div>
         </div>
     </form>
