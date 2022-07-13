@@ -1,4 +1,5 @@
-﻿using SportsNews.Data.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,7 +11,6 @@ namespace SportsNews.Models
     public class LayoutViewModel
     {
         public string Title { get; set; }
-        public bool IsAdminMode { get; set; }
 
         public string Language { 
             get
@@ -26,14 +26,12 @@ namespace SportsNews.Models
         public LayoutViewModel(string title)
         {
             Title = title;
-            IsAdminMode = false;
             UserImg = null;
         }
 
-        public LayoutViewModel(string title, bool isAdminMode, byte[] userImg)
+        public LayoutViewModel(string title, byte[] userImg)
         {
             Title = title;
-            IsAdminMode = isAdminMode;
             UserImg = userImg;
         }
     }
@@ -42,7 +40,7 @@ namespace SportsNews.Models
     {
         public T PageModel { get; set; }
 
-        public LayoutViewModel() : base(string.Empty, false, null)
+        public LayoutViewModel() : base(string.Empty, null)
         { }
 
         public LayoutViewModel(T pageModel, string title) : base(title)
@@ -50,12 +48,7 @@ namespace SportsNews.Models
             PageModel = pageModel;
         }
 
-        public LayoutViewModel(T pageModel, string title, bool isAdminMode) : base(title, isAdminMode, null)
-        {
-            PageModel = pageModel;
-        }
-
-        public LayoutViewModel(T pageModel, string title, bool isAdminMode, byte[] userImg) : base(title, isAdminMode, userImg)
+        public LayoutViewModel(T pageModel, string title, byte[] userImg) : base(title, userImg)
         {
             PageModel = pageModel;
         }

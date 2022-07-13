@@ -119,7 +119,7 @@ namespace SportsNews.Controllers
                 LastName = User.Claims.FirstOrDefault(x => x.Type == Claims.LastName)?.Value ?? String.Empty,
                 Image = unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture ?? Array.Empty<byte>()
             };
-            var model = new LayoutViewModel<UserInfoViewModel>(innerModel, "Personal Info", false, innerModel.Image)
+            var model = new LayoutViewModel<UserInfoViewModel>(innerModel, "Personal Info", innerModel.Image)
             {
                 Languages = this.languages,
                 UserMenu = this.userMenuItems
@@ -177,7 +177,7 @@ namespace SportsNews.Controllers
         public ActionResult UserPassword()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("Change Password", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
+            var model = new LayoutViewModel("Change Password", unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
             {
                 Languages = this.languages,
                 UserMenu = this.userMenuItems
@@ -189,7 +189,7 @@ namespace SportsNews.Controllers
         public ActionResult UserSurveys()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("My Surveys", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
+            var model = new LayoutViewModel("My Surveys", unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
             {
                 Languages = this.languages,
                 UserMenu = this.userMenuItems
@@ -201,7 +201,7 @@ namespace SportsNews.Controllers
         public ActionResult UserTeamHub()
         {
             var userId = Guid.Parse(this.userManager.GetUserId(User));
-            var model = new LayoutViewModel("Team Hub", false, unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
+            var model = new LayoutViewModel("Team Hub",  unitOfWork.UsersPhoto.GetUserPhotoByUserId(userId)?.ProfilePicture)
             {
                 Languages = this.languages,
                 UserMenu = this.userMenuItems

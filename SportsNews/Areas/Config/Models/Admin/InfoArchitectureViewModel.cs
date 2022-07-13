@@ -1,4 +1,5 @@
-﻿using SportsNews.Data.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using SportsNews.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

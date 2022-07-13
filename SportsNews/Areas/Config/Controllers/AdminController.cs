@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using SportsNews.Data;
 using SportsNews.Data.Models;
@@ -20,14 +21,17 @@ namespace SportsNews.Controllers
     public class AdminController : Controller
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IStringLocalizer<AdminController> stringLocalizer;
         private readonly IOptions<RequestLocalizationOptions> locOptions;
         private readonly IEnumerable<AdminMenu> menuItems;
         private readonly IEnumerable<Language> languages;
         private readonly IEnumerable<Category> userMenuItems;
 
-        public AdminController(IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions)
+
+        public AdminController(IUnitOfWork unitOfWork, IOptions<RequestLocalizationOptions> locOptions, IStringLocalizer<AdminController> stringLocalizer)
         {
             this.unitOfWork = unitOfWork;
+            this.stringLocalizer = stringLocalizer;
             this.locOptions = locOptions;
             menuItems = this.unitOfWork.AdminMenu.GetItems().ToList();
             languages = this.unitOfWork.Languages.GetItems().ToList();
@@ -36,12 +40,11 @@ namespace SportsNews.Controllers
 
         public IActionResult Index()
         {
-            var model = new LayoutViewModel("Administration zone", true,
+            var model = new LayoutViewModel("Administration zone", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
+                Languages = this.languages
             };
             return View(model);
         }
@@ -59,7 +62,7 @@ namespace SportsNews.Controllers
                 SelectedSubCategory = new AdminMenuItemViewModel { Id = 0 },
                 SelectedTeam = new AdminMenuItemViewModel { Id = 0 }
             };
-            var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
+            var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
@@ -94,7 +97,7 @@ namespace SportsNews.Controllers
                     Name = tId != 0 ? unitOfWork.Teams.GetItemByID(tId).Name : string.Empty
                 }
             };
-            var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", true,
+            var model = new LayoutViewModel<InfoArchitectureViewModel>(modelInfo, "Information architecture", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
@@ -151,12 +154,14 @@ namespace SportsNews.Controllers
             });
         }
 
+        // There is Custom Model Binding to check specific errors in model
         [HttpPost]
-        public IActionResult AddTeam(LayoutViewModel<InfoArchitectureViewModel> model)
+        public IActionResult AddTeam([ModelBinder(BinderType = typeof(InfoArchitectureBinder))] LayoutViewModel<InfoArchitectureViewModel> model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                model.UserImg = this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>();
+                return View("InfoArchitecture", model);
             }
 
             if (!string.IsNullOrEmpty(model.PageModel.SelectedTeam.NewName))
@@ -552,7 +557,7 @@ namespace SportsNews.Controllers
 
         private LayoutViewModel<TeamsExViewModel> GetComposedAdminModel(TeamsExViewModel model)
         {
-            return new LayoutViewModel<TeamsExViewModel>(model, "Teams", true,
+            return new LayoutViewModel<TeamsExViewModel>(model, "Teams", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
@@ -574,7 +579,7 @@ namespace SportsNews.Controllers
         public IActionResult Languages(int id)
         {
             var lModel = id == 0 ? new Language() : unitOfWork.Languages.GetItemByID(id);
-            var model = new LayoutViewModel<Language>(lModel, "Languages", true,
+            var model = new LayoutViewModel<Language>(lModel, "Languages", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
@@ -668,12 +673,11 @@ namespace SportsNews.Controllers
         public IActionResult Articles(int id)
         {
             //TODO: seclest all articles for selected Category
-            var model = new LayoutViewModel("Articles", true,
+            var model = new LayoutViewModel("Articles", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
+                Languages = this.languages
             };
 
             return View(model);
@@ -682,12 +686,11 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult AddNewArticle()
         {
-            var model = new LayoutViewModel("NewArticle", true,
+            var model = new LayoutViewModel("NewArticle", 
                 this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
             {
                 Menu = this.menuItems,
-                Languages = this.languages,
-                UserMenu = this.userMenuItems
+                Languages = this.languages
             };
 
             return View(model);
@@ -699,7 +702,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Survey()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Surveys"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -707,7 +716,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Banner()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Banners"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -715,7 +730,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Footer()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Footer"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -723,7 +744,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult SocialNetwork()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Social Networks"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -731,7 +758,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Users()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Users"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -739,7 +772,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult NewsPartner()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["News Partners"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 
@@ -747,7 +786,13 @@ namespace SportsNews.Controllers
         [HttpGet]
         public IActionResult Advertising()
         {
-            return View();
+            var model = new LayoutViewModel(this.stringLocalizer["Advertising"], 
+                this.unitOfWork.UsersPhoto.GetUserPhotoByUserName(User.Identity.Name)?.ProfilePicture ?? Array.Empty<byte>())
+            {
+                Menu = this.menuItems,
+                Languages = this.languages
+            };
+            return View(model);
         }
         #endregion
 

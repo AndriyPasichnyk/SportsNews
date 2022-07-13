@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Administration zone";
 }
+<div class="text-danger" asp-validation-summary="All"></div>
+
 <partial name="_AddAdminMenuItemsPartial" />
 <partial name="_EditAdminMenuItemsPartial" />
 <partial name="_DeleteAdminMenuItemsPartial" />
@@ -45,9 +47,9 @@
                                 <button class="dropdown-item" data-toggle="modal" data-target="#EditCategoryModal">Edit</button>
                             }
                             <form method="post">
-                                <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />
-                                <button type="submit" class="dropdown-item" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideCategory">@(item.IsVisible ? "Hide" : "Show")</button>
-                            </form>
+                                <input type="hidden" asp-for="PageModel.SelectedCategory.Id" />*@
+                                <button type="submit" class="dropdown-item" asp-area="Config" asp-controller="@ControllersNames.Admin" asp-action="HideOrUnhideCategory">@(item.IsVisible ? "Hide" : "Show")</button>
+                            </form>*@
                         </div>
                     </div>
                 </div>

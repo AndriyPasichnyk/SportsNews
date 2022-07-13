@@ -12,7 +12,7 @@ namespace SportsNews
         public void OnException(ExceptionContext context)
         {
             context.ExceptionHandled = true;
-            context.Result = new RedirectToActionResult("Error", "Home", null);
+            context.Result = new RedirectToActionResult("Error", "Home", new { area = "" });
         }
     }
 }
