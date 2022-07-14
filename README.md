@@ -1,6 +1,11 @@
 # SportsNews
 SportsNews project for retraining program
 
+This project for showing Sport news related to diferent sport categories and teams. In this project Administarator could define sport categories with teams and configure what will be shown to users.
+
+To start project:
+Start solution file in Visual Studio 2019. Database could be stored on SQL Server 2019 Express.
+
 ----------------------------------------------------------------------------------------------------------------
 
 Iteration 1
@@ -43,6 +48,8 @@ Configure navigation section (admin side)
   Allow admin user to show and hide navigation menu items on the portal
 	Allow admin user to change order of the navigation menu items and move them between the categories and subcategories
 
+![зображення](https://user-images.githubusercontent.com/105735464/178977377-dbbae8f7-bfd6-4d95-b151-0525f183d64a.png)
+
 Log in and sign up to the portal
 
 Login (user side)
@@ -62,6 +69,8 @@ Manage teams (admin side)
 	Allow admin users to edit the existing team
 	Allow admin users to filter and search the teams
 	Allow admin users to delete the existing team
+
+![зображення](https://user-images.githubusercontent.com/105735464/178977545-a53cc87b-195d-438e-9b6c-5a78e48261ed.png)
 
 View navigation section (user side)	
   Allow site users to navigate to the sports categories, subcategories, and teams page on the portal-no articles, empty pages
